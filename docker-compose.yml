@@ -38,13 +38,10 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
   mongo:
-    image: mongo:5.0.0
     restart: always
+    image: mongo:4.4
     ports:
       - '27017:27017'
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: urlshortener
     volumes:
       - mongodb:/data/db
 

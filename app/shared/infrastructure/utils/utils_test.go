@@ -41,8 +41,8 @@ func Test_ConvertEntity(t *testing.T) {
 
 		err := ConvertEntity(e1, e2)
 
-		require.Error(t, err)
-		assert.Equal(t, e2, "")
+		assert.Error(t, err)
+
 	})
 }
 

@@ -5,12 +5,12 @@ import (
 	"time"
 )
 
-type Bus interface {
+type EventBus interface {
 	Publish(context.Context, []Event) error
 	//Subscribe(Type, Handler)
 }
 
-//go:generate mockery --case=snake --outpkg=eventmocks --output=../../infrastructure/bus/busMocks/eventmocks --name=Bus
+//go:generate mockery --case=snake --outpkg=eventmocks --output=../../infrastructure/bus/busmocks/eventmocks --name=EventBus
 
 type Handler interface {
 	Handle(context.Context, Event) error

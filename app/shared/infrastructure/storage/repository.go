@@ -10,6 +10,6 @@ var (
 )
 
 type Repository interface {
-	Create(ctx context.Context, aEntity interface{}) (err error)
-	FindById(ctx context.Context, filter map[string]interface{}) (aEntity interface{}, err error)
+	Create(ctx context.Context, anAggregate interface{}) (err error)
+	FindById(ctx context.Context, filter map[string]interface{}) (anAggregate interface{}, err error)
 }
