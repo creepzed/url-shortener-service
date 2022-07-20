@@ -30,6 +30,7 @@ func main() {
 	dbUrlShortener := mongo.NewUrlShortenerRepositoryMongo(mongodbConn, dbTimeOut)
 
 	commandBusInMemory := inmemory.NewCommandBusMemory()
+	queryBusInMemory := inmemory.NewQueryBusMemory()
 	eventBusInMemory := inmemory.NewEventBusInMemory()
 
 	createService := creating.NewCreateApplicationService(dbUrlShortener, eventBusInMemory)
@@ -38,7 +39,7 @@ func main() {
 
 	commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-	controllers.NewUrlShortenerController(server, commandBusInMemory)
+	controllers.NewUrlShortenerController(server, commandBusInMemory, queryBusInMemory)
 
 	server.Logger.Fatal(server.StartServer(rest.Setup(host, port)))
 }

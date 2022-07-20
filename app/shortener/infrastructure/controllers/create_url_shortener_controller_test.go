@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	inmemoryBus "github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/inmemory"
-	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/rest"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/creating"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/mother"
@@ -37,6 +36,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 		dataBaseInMemory := inmemoryDB.NewDataBaseInMemory()
 		eventBusInMemory := inmemoryBus.NewEventBusInMemory()
 		commandBusInMemory := inmemoryBus.NewCommandBusMemory()
+		queryBusInMemory := inmemoryBus.NewQueryBusMemory()
 
 		createService := creating.NewCreateApplicationService(dataBaseInMemory, eventBusInMemory)
 
@@ -44,7 +44,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory)
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -68,6 +68,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		dataBaseInMemory := inmemoryDB.NewDataBaseInMemory()
 		eventBusInMemory := inmemoryBus.NewEventBusInMemory()
+		queryBusInMemory := inmemoryBus.NewQueryBusMemory()
 		commandBusInMemory := inmemoryBus.NewCommandBusMemory()
 
 		createService := creating.NewCreateApplicationService(dataBaseInMemory, eventBusInMemory)
@@ -76,7 +77,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory)
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -101,6 +102,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 		dataBaseInMemory := inmemoryDB.NewDataBaseInMemory()
 		eventBusInMemory := inmemoryBus.NewEventBusInMemory()
 		commandBusInMemory := inmemoryBus.NewCommandBusMemory()
+		queryBusInMemory := inmemoryBus.NewQueryBusMemory()
 
 		createService := creating.NewCreateApplicationService(dataBaseInMemory, eventBusInMemory)
 
@@ -108,7 +110,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory)
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -132,6 +134,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 		dataBaseInMemory := inmemoryDB.NewDataBaseInMemory()
 		eventBusInMemory := inmemoryBus.NewEventBusInMemory()
 		commandBusInMemory := inmemoryBus.NewCommandBusMemory()
+		queryBusInMemory := inmemoryBus.NewQueryBusMemory()
 
 		createService := creating.NewCreateApplicationService(dataBaseInMemory, eventBusInMemory)
 
@@ -139,7 +142,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory)
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -177,12 +180,13 @@ func TestCreateUrlShortenerController(t *testing.T) {
 		commandBusInMemory := inmemoryBus.NewCommandBusMemory()
 
 		createService := creating.NewCreateApplicationService(mockRepository, eventBusInMemory)
+		queryBusInMemory := inmemoryBus.NewQueryBusMemory()
 
 		createCommandHandler := creating.NewCreateUrlShortenerCommandHandler(createService)
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory)
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -192,10 +196,4 @@ func TestCreateUrlShortenerController(t *testing.T) {
 			assert.Equal(t, http.StatusConflict, res.StatusCode)
 		}
 	})
-}
-
-func echoServer() *echo.Echo {
-	e := echo.New()
-	e.Validator = rest.NewValidator()
-	return e
 }
