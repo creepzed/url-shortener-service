@@ -20,3 +20,4 @@ go.sum
 
 # Bulk files and folders
 bulk
+.env

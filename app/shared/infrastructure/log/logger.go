@@ -142,7 +142,7 @@ func (logger *Log) Printf(message string, args ...interface{}) {
 
 func Print(args ...interface{}) { instance.Print(args...) }
 func (logger *Log) Print(args ...interface{}) {
-	logger.Println(args)
+	logger.log.Debug(fmt.Sprint(args...))
 }
 
 func Println(args ...interface{}) { instance.Print(args...) }
