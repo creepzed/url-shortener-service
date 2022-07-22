@@ -2,12 +2,12 @@ package creating
 
 import (
 	"context"
-	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/busmocks/eventmocks"
+	"github.com/creepzed/url-shortener-service/app/shared/application/mocks/eventmocks"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/exception"
+	"github.com/creepzed/url-shortener-service/app/shortener/domain/mocks/storagemocks"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/mother"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/randomvalues"
-	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/storagemocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"

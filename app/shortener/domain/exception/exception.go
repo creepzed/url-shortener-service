@@ -14,4 +14,8 @@ var (
 
 	ErrDataBase = errors.New("error saving to database")
 	ErrEventBus = errors.New("error saving to eventbus")
+
+	ErrUrlNotFound = errors.New("url not found")
+
+	ErrTransforming = errors.New("error transforming data")
 )

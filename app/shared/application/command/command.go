@@ -9,7 +9,7 @@ type CommandBus interface {
 	Register(Type, Handler)
 }
 
-//go:generate mockery --case=snake --outpkg=commandmocks --output=../../infrastructure/bus/busmocks/commandmocks --name=CommandBus
+//go:generate mockery --case=snake --outpkg=commandmocks --output=../mocks/commandmocks --name=CommandBus
 
 type Type string
 
@@ -17,7 +17,7 @@ type Command interface {
 	Type() Type
 }
 
-//go:generate mockery --case=snake --outpkg=commandmocks --output=../../infrastructure/bus/busmocks/commandmocks --name=Command
+//go:generate mockery --case=snake --outpkg=commandmocks --output=../mocks/commandmocks --name=Command
 
 type Handler interface {
 	Handle(context.Context, Command) error

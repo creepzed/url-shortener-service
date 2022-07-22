@@ -28,6 +28,8 @@ func (ctrl *createUrlShortenerController) Find(c echo.Context) (err error) {
 		switch {
 		case errors.Is(err, exception.ErrInvalidUrlId):
 			codeErr = http.StatusBadRequest
+		case errors.Is(err, exception.ErrUrlNotFound):
+			codeErr = http.StatusNotFound
 		}
 		c.JSON(codeErr, echo.Map{"message": err.Error()})
 		return err

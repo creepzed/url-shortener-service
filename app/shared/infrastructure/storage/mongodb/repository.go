@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/log"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage"
@@ -10,11 +11,11 @@ import (
 )
 
 type repositoryMongoDB struct {
-	connection MongoConnection
+	connection ConnectionMongo
 	dbTimeout  time.Duration
 }
 
-func NewRepositoryMongoDB(connection MongoConnection, dbTimeout time.Duration) *repositoryMongoDB {
+func NewRepositoryMongoDB(connection ConnectionMongo, dbTimeout time.Duration) *repositoryMongoDB {
 	return &repositoryMongoDB{
 		connection: connection,
 		dbTimeout:  dbTimeout,
@@ -69,9 +70,11 @@ func (r *repositoryMongoDB) FindById(ctx context.Context, filter map[string]inte
 		return nil, result.Err()
 	}
 
-	if result == nil {
-		return nil, nil
+	doc := make(map[string]interface{}, 0)
+	err = result.Decode(&doc)
+	if err != nil {
+		return nil, errors.New("error transforming data from mongo")
 	}
 
-	return result, nil
+	return doc, nil
 }

@@ -20,7 +20,7 @@ var (
 	ErrPing       = errors.New("error ping to mongodb")
 )
 
-type MongoConnection interface {
+type ConnectionMongo interface {
 	GetCollection(ctx context.Context) (*mongo.Collection, error)
 	Close(ctx context.Context)
 }

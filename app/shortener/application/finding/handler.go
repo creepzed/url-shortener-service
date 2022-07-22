@@ -22,9 +22,9 @@ func NewFindUrlShortenerQueryHandler(applicationService FindApplicationService) 
 }
 
 func (h FindUrlShortenerQueryHandler) Handle(ctx context.Context, qry query.Query) (query.Result, error) {
-	command, ok := qry.(FindUrlShortenerQuery)
+	query, ok := qry.(FindUrlShortenerQuery)
 	if !ok {
 		return nil, fmt.Errorf("%w: %s", ErrUnexpectedQuery, qry.Type())
 	}
-	return h.applicationService.Do(ctx, command)
+	return h.applicationService.Do(ctx, query)
 }

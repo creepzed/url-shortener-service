@@ -50,12 +50,14 @@ func EntityToJsonEscape(entity interface{}) string {
 	return string(str)
 }
 
-func JsonToEntity(jsonIn string, entity interface{}) {
+func JsonToEntity(jsonIn string, entity interface{}) error {
 	err := json.Unmarshal([]byte(jsonIn), entity)
 
 	if err != nil {
 		entity = nil
+		return err
 	}
+	return nil
 }
 
 func IsNilFixed(i interface{}) bool {
