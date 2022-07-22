@@ -21,9 +21,7 @@ jobs:
         go-version: 1.18
 
     - name: Download dependencies
-      run: |
-        - go mod download -x
-        - go mod vendor
+      run: go mod vendor
     
     - name: Test
       run: go test -v -coverprofile=coverage.txt ./...
