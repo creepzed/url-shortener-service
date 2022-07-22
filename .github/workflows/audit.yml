@@ -22,7 +22,6 @@ jobs:
       run: |
         go version
         go mod vendor
-        go get -u golang.org/x/lint/golint
 
     - name: Verify dependencies
       run: go mod verify
