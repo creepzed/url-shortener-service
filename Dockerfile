@@ -5,9 +5,9 @@ RUN apk --no-cache add git dep ca-certificates
 ENV GOBIN=$GOPATH/bin
 ENV GO111MODULE="on"
 
-RUN mkdir -p $GOPATH/src
+RUN mkdir -p $GOPATH/src/github.com/creepzed/url-shortener-service
 
-WORKDIR $GOPATH/src
+WORKDIR $GOPATH/src/github.com/creepzed/url-shortener-service
 
 COPY go.mod .
 COPY app/ app/
