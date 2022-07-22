@@ -2,6 +2,7 @@ package inmemory
 
 import (
 	"context"
+	"errors"
 	"github.com/creepzed/url-shortener-service/app/shared/application/command"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/log"
 )
@@ -19,11 +20,11 @@ func NewCommandBusMemory() *CommandBus {
 func (cb *CommandBus) Dispatch(ctx context.Context, cmd command.Command) error {
 	handler, ok := cb.handlers[cmd.Type()]
 	if !ok {
-		return nil
+		return errors.New("error: command not found")
 	}
 	err := handler.Handle(ctx, cmd)
 	if err != nil {
-		log.Error("error while handling %s - %s\n", cmd.Type(), err)
+		log.Error("error: while command handling %s - %s", cmd.Type(), err)
 		return err
 	}
 	return nil

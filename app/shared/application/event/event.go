@@ -10,7 +10,7 @@ type EventBus interface {
 	//Subscribe(Type, Handler)
 }
 
-//go:generate mockery --case=snake --outpkg=eventmocks --output=../../infrastructure/bus/busmocks/eventmocks --name=EventBus
+//go:generate mockery --case=snake --outpkg=eventmocks --output=../mocks/eventmocks --name=EventBus
 
 type Handler interface {
 	Handle(context.Context, Event) error

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"github.com/creepzed/url-shortener-service/app/shared/application/command"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/creating"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/exception"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/randomvalues"
@@ -10,26 +9,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
-
-type createUrlShortenerController struct {
-	commandBus command.CommandBus
-}
-
-func NewUrlShortenerController(e *echo.Echo, commandBus command.CommandBus) *createUrlShortenerController {
-	controller := &createUrlShortenerController{
-		commandBus: commandBus,
-	}
-
-	v1 := e.Group("/api/v1")
-	{
-		subGroup := v1.Group("/shortener")
-		{
-			subGroup.POST("", controller.Create)
-		}
-	}
-	return controller
-
-}
 
 func (ctrl *createUrlShortenerController) Create(c echo.Context) (err error) {
 	request := new(request.UrlShortenerCreateRequest)
@@ -44,6 +23,7 @@ func (ctrl *createUrlShortenerController) Create(c echo.Context) (err error) {
 		return err
 	}
 
+	//TODO: I need to work at Key Generator Service
 	urlId := randomvalues.RandomUrlId()
 
 	cmd := creating.NewCreateUrlShortenerCommand(
@@ -58,7 +38,7 @@ func (ctrl *createUrlShortenerController) Create(c echo.Context) (err error) {
 		switch {
 		case errors.Is(err, exception.ErrUrlIdDuplicate):
 			codeErr = http.StatusConflict
-		case errors.Is(err, exception.ErrInvalidOriginalUrl),
+		case errors.Is(err, exception.ErrInvalidUrlId),
 			errors.Is(err, exception.ErrInvalidOriginalUrl),
 			errors.Is(err, exception.ErrInvalidUserId):
 			codeErr = http.StatusBadRequest

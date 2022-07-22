@@ -3,11 +3,11 @@ package creating
 import (
 	"context"
 	"github.com/creepzed/url-shortener-service/app/shared/application/command"
-	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/busmocks/commandmocks"
-	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/busmocks/eventmocks"
+	"github.com/creepzed/url-shortener-service/app/shared/application/mocks/commandmocks"
+	"github.com/creepzed/url-shortener-service/app/shared/application/mocks/eventmocks"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
+	"github.com/creepzed/url-shortener-service/app/shortener/domain/mocks/storagemocks"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/randomvalues"
-	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/storagemocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -17,10 +17,6 @@ import (
 func TestCreateUrlShortenerCommandHandler(t *testing.T) {
 	t.Parallel()
 	t.Run("given a valid registered command it is executed", func(t *testing.T) {
-
-		//var commandMockType command.Type = "command.mock"
-		//cmdMock := commandmocks.NewCommand(t)
-		//cmdMock.On("Type").Return(commandMockType)
 
 		cmd := NewCreateUrlShortenerCommand(randomvalues.RandomUrlId(), randomvalues.RandomOriginalUrl(), randomvalues.RandomUserId())
 

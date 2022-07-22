@@ -14,10 +14,10 @@ import (
 )
 
 type UrlShortenerMongoDB struct {
-	UrlId       string `bson:"url_id"`
-	UrlEnable   bool   `bson:"url_enable"`
-	OriginalUrl string `bson:"origin_url"`
-	UserId      string `bson:"user_id"`
+	UrlId       string `json:"url_id" bson:"url_id"`
+	UrlEnable   bool   `json:"url_enable" bson:"url_enable"`
+	OriginalUrl string `json:"original_url" bson:"original_url"`
+	UserId      string `json:"user_id" bson:"user_id"`
 }
 
 func NewUrlShortenerMongo(urlShortener domain.UrlShortener) *UrlShortenerMongoDB {
@@ -33,7 +33,7 @@ type urlShortenerRepositoryMongoDB struct {
 	baseRepository storage.Repository
 }
 
-func NewUrlShortenerRepositoryMongo(connection mongodb.MongoConnection, dbTimeout time.Duration) *urlShortenerRepositoryMongoDB {
+func NewUrlShortenerRepositoryMongo(connection mongodb.ConnectionMongo, dbTimeout time.Duration) *urlShortenerRepositoryMongoDB {
 	return &urlShortenerRepositoryMongoDB{
 		baseRepository: mongodb.NewRepositoryMongoDB(connection, dbTimeout),
 	}
@@ -63,7 +63,7 @@ func (u *urlShortenerRepositoryMongoDB) FindById(ctx context.Context, urlId vo.U
 	}
 
 	doc := new(UrlShortenerMongoDB)
-	err = utils.ConvertEntity(result, doc)
+	err = utils.ConvertEntity(result, &doc)
 	if err != nil {
 		return domain.UrlShortener{}, err
 	}

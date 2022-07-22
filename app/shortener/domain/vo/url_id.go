@@ -19,13 +19,21 @@ func NewUrlId(value string) (urlId UrlId, err error) {
 }
 
 func (u *UrlId) hasError() error {
+	err := IsValidUrlId(u.value)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func IsValidUrlId(urlId string) error {
 	pattern := "[0-9A-Za-z]$"
-	if u.value == "" {
+	if urlId == "" {
 		return fmt.Errorf("%w", exception.ErrEmptyUrlId)
 	}
-	match, _ := regexp.MatchString(pattern, u.value)
+	match, _ := regexp.MatchString(pattern, urlId)
 	if !match {
-		return fmt.Errorf("%w: %s", exception.ErrInvalidUrlId, u.value)
+		return fmt.Errorf("%w: %s", exception.ErrInvalidUrlId, urlId)
 	}
 	return nil
 }
