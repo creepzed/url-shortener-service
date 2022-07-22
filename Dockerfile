@@ -12,6 +12,7 @@ WORKDIR $GOPATH/src/github.com/creepzed/url-shortener-service
 COPY go.mod .
 COPY app/ app/
 
+RUN go mod tidy
 RUN go mod vendor
 
 RUN CGO_ENABLED=0 GOOS=linux go build -mod=vendor -a -installsuffix cgo -ldflags '-extldflags "-static"' -o $GOBIN/main ./app/main.go
