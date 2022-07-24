@@ -88,3 +88,16 @@ func (u *urlShortenerRepositoryMongoDB) FindById(ctx context.Context, urlId vo.U
 	anUrlShortener := domain.LoadUrlShortener(anUrlId, anUrlEnable, anOriginalUrl, anUserId)
 	return anUrlShortener, nil
 }
+
+func (u *urlShortenerRepositoryMongoDB) Update(ctx context.Context, urlShortener domain.UrlShortener) error {
+	filter := map[string]interface{}{
+		"url_id": urlShortener.UrlId().Value(),
+	}
+	doc := NewUrlShortenerMongo(urlShortener)
+	err := u.baseRepository.Update(ctx, filter, doc)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

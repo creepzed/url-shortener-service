@@ -64,8 +64,39 @@ func (s *UrlShortener) Record(event eventBase.Event) {
 	s.events = append(s.events, event)
 }
 
-func (s UrlShortener) PullEvents() []eventBase.Event {
+func (s *UrlShortener) PullEvents() []eventBase.Event {
 	eventAux := s.events
 	//s.events = []event.Event{}
 	return eventAux
+}
+
+func (s *UrlShortener) IsChanged() bool {
+	return len(s.events) > 0
+}
+
+func (s *UrlShortener) Update(isEnabled vo.UrlEnabled, originalUrl vo.OriginalUrl, userId vo.UserId) {
+	isChanged := false
+	if isEnabled.Value() != s.urlEnabled.Value() {
+		s.urlEnabled = isEnabled
+		isChanged = true
+	}
+
+	if originalUrl.Value() != s.originalUrl.Value() {
+		s.originalUrl = originalUrl
+		isChanged = true
+	}
+
+	if userId.Value() != s.userId.Value() {
+		s.userId = userId
+		isChanged = true
+	}
+
+	if isChanged {
+		s.Record(event.NewShortenerUpdatedEvent(
+			s.UrlId().Value(),
+			s.IsEnabled().Value(),
+			s.OriginalUrl().Value(),
+			s.UserId().Value(),
+		))
+	}
 }

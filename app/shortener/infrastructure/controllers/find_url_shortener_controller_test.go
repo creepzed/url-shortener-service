@@ -69,7 +69,6 @@ func TestFindUrlShortener(t *testing.T) {
 			assert.Equal(t, jsonExpected, rec.Body.String())
 		}
 	})
-
 	t.Run("given a valid Url Short, return error data and code 404", func(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
@@ -112,10 +111,48 @@ func TestFindUrlShortener(t *testing.T) {
 			assert.Equal(t, http.StatusNotFound, rec.Code)
 		}
 	})
-
 	t.Run("given a invalid Url Short, return error data and code 400", func(t *testing.T) {
 
 		urlId := randomvalues.InvalidUrlId()
+
+		target := "/api/v1/shortener/"
+
+		e := echoServer()
+		req := httptest.NewRequest(http.MethodGet, target, nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+
+		ctx := e.NewContext(req, rec)
+		ctx.SetPath(fmt.Sprintf("%s/:url_id", target))
+		ctx.SetParamNames("url_id")
+		ctx.SetParamValues(urlId)
+
+		mockRepository := storagemocks.NewUrlShortenerRepository(t)
+
+		commandBusInMemory := inmemoryBus.NewCommandBusMemory()
+		queryBusInMemory := inmemoryBus.NewQueryBusMemory()
+
+		transform := transformer.NewTransformer()
+
+		findService := finding.NewFindApplicationService(mockRepository, transform)
+
+		findQueryHandler := finding.NewFindUrlShortenerQueryHandler(findService)
+		queryBusInMemory.Register(finding.FindUrlShortenerQueryType, findQueryHandler)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		err := urlShortenerController.Find(ctx)
+
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if assert.Error(t, err) {
+			assert.ErrorIs(t, err, exception.ErrInvalidUrlId)
+			assert.Equal(t, http.StatusBadRequest, rec.Code)
+		}
+	})
+	t.Run("given a empty Url Short, return error data and code 400", func(t *testing.T) {
+
+		urlId := ""
 
 		target := "/api/v1/shortener/"
 

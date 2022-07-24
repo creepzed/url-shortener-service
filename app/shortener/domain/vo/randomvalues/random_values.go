@@ -19,6 +19,10 @@ func RandomUrlId() string {
 	return string(dst)
 }
 
+func RandomIsEnabled() bool {
+	return rand.Intn(2) != 0
+}
+
 func RandomOriginalUrl() string {
 	return faker.URL()
 }

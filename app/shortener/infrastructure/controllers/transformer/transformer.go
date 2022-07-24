@@ -18,6 +18,7 @@ func (t transformer) Transform(urlShortener domain.UrlShortener) (interface{}, e
 		UrlId:       urlShortener.UrlId().Value(),
 		IsEnabled:   urlShortener.IsEnabled().Value(),
 		OriginalUrl: urlShortener.OriginalUrl().Value(),
+		UserId:      urlShortener.UserId().Value(),
 	}
 
 	return anUrlShortener, nil

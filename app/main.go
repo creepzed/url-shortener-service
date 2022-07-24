@@ -6,6 +6,7 @@ import (
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage/mongodb"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/creating"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/finding"
+	"github.com/creepzed/url-shortener-service/app/shortener/application/updating"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers/transformer"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/mongo"
@@ -53,6 +54,10 @@ func main() {
 	findService := finding.NewFindApplicationService(repositoryMongo, transform)
 	findQueryHandler := finding.NewFindUrlShortenerQueryHandler(findService)
 	queryBusInMemory.Register(finding.FindUrlShortenerQueryType, findQueryHandler)
+
+	updateService := updating.NewUpdateApplicationService(repositoryMongo, eventBusInMemory)
+	updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
+	commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
 
 	controllers.NewUrlShortenerController(server, commandBusInMemory, queryBusInMemory)
 

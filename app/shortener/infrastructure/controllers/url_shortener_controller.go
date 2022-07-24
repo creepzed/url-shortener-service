@@ -1,18 +1,23 @@
 package controllers
 
 import (
+	"errors"
 	"github.com/creepzed/url-shortener-service/app/shared/application/command"
 	"github.com/creepzed/url-shortener-service/app/shared/application/query"
 	"github.com/labstack/echo/v4"
 )
 
-type createUrlShortenerController struct {
+type urlShortenerController struct {
 	commandBus command.CommandBus
 	queryBus   query.QueryBus
 }
 
-func NewUrlShortenerController(e *echo.Echo, commandBus command.CommandBus, queryBus query.QueryBus) *createUrlShortenerController {
-	controller := &createUrlShortenerController{
+var (
+	ErrInvalidBodyRequest = errors.New("the request body is invalid")
+)
+
+func NewUrlShortenerController(e *echo.Echo, commandBus command.CommandBus, queryBus query.QueryBus) *urlShortenerController {
+	controller := &urlShortenerController{
 		commandBus: commandBus,
 		queryBus:   queryBus,
 	}
@@ -23,6 +28,7 @@ func NewUrlShortenerController(e *echo.Echo, commandBus command.CommandBus, quer
 		{
 			subGroup.POST("", controller.Create)
 			subGroup.GET("/:url_id", controller.Find)
+			subGroup.PUT("/:url_id", controller.Update)
 		}
 	}
 	return controller

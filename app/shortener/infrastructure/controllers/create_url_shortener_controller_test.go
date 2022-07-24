@@ -5,6 +5,7 @@ import (
 	inmemoryBus "github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/inmemory"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/creating"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
+	"github.com/creepzed/url-shortener-service/app/shortener/domain/exception"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/mocks/storagemocks"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/mother"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/randomvalues"
@@ -24,7 +25,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 	t.Run("given a valid request it returns 201", func(t *testing.T) {
 		target := "/api/v1/shortener"
-		requestString := request.RandomUrlShortenerCreateRequest().String()
+		requestString := request.RandomUrlShortenerRequestCreate().String()
 
 		e := echoServer()
 		req := httptest.NewRequest(http.MethodPost, target, strings.NewReader(requestString))
@@ -33,12 +34,19 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		ctx := e.NewContext(req, rec)
 
-		dataBaseInMemory := inmemoryDB.NewDataBaseInMemory()
+		mockRepository := storagemocks.NewUrlShortenerRepository(t)
+		mockRepository.
+			On("FindById", context.Background(), mock.AnythingOfType("vo.UrlId")).
+			Return(domain.UrlShortener{}, nil)
+		mockRepository.
+			On("Create", context.Background(), mock.AnythingOfType("domain.UrlShortener")).
+			Return(nil)
+
 		eventBusInMemory := inmemoryBus.NewEventBusInMemory()
 		commandBusInMemory := inmemoryBus.NewCommandBusMemory()
 		queryBusInMemory := inmemoryBus.NewQueryBusMemory()
 
-		createService := creating.NewCreateApplicationService(dataBaseInMemory, eventBusInMemory)
+		createService := creating.NewCreateApplicationService(mockRepository, eventBusInMemory)
 
 		createCommandHandler := creating.NewCreateUrlShortenerCommandHandler(createService)
 
@@ -54,10 +62,9 @@ func TestCreateUrlShortenerController(t *testing.T) {
 			assert.Equal(t, http.StatusCreated, rec.Code)
 		}
 	})
-
 	t.Run("given an invalid request when the origin url is wrong, then returns 400 with an error message", func(t *testing.T) {
 		target := "/api/v1/shortener"
-		requestString := request.FailRequestWithWrongOriginalUrl().String()
+		requestString := request.FailRequestCreateWithWrongOriginalUrl().String()
 
 		e := echoServer()
 		req := httptest.NewRequest(http.MethodPost, target, strings.NewReader(requestString))
@@ -87,10 +94,9 @@ func TestCreateUrlShortenerController(t *testing.T) {
 			assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 		}
 	})
-
 	t.Run("given an invalid request when the user id is wrong, then returns 400 with an error message", func(t *testing.T) {
 		target := "/api/v1/shortener"
-		requestString := request.FailRequestWithWrongUserId().String()
+		requestString := request.FailRequestCreateWithWrongUserId().String()
 
 		e := echoServer()
 		req := httptest.NewRequest(http.MethodPost, target, strings.NewReader(requestString))
@@ -120,10 +126,9 @@ func TestCreateUrlShortenerController(t *testing.T) {
 			assert.Equal(t, http.StatusBadRequest, res.StatusCode)
 		}
 	})
-
-	t.Run("given a invalid request it returns 400", func(t *testing.T) {
+	t.Run("given a body invalid request  it returns 400", func(t *testing.T) {
 		target := "/api/v1/shortener"
-		requestString := "{}{"
+		requestString := "&&&&&&&"
 		e := echoServer()
 		req := httptest.NewRequest(http.MethodPost, target, strings.NewReader(requestString))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -150,9 +155,9 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		if assert.Error(t, err) {
 			assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+			assert.ErrorIs(t, err, ErrInvalidBodyRequest)
 		}
 	})
-
 	t.Run("given the duplicate UrlId returns 409", func(t *testing.T) {
 		target := "/api/v1/shortener"
 
@@ -160,7 +165,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 		originalUrl := randomvalues.RandomOriginalUrl()
 		userId := randomvalues.RandomUserId()
 
-		requestString := request.RandomUrlShortenerCreateRequest().String()
+		requestString := request.RandomUrlShortenerRequestCreate().String()
 
 		e := echoServer()
 		req := httptest.NewRequest(http.MethodPost, target, strings.NewReader(requestString))
@@ -194,6 +199,86 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		if assert.Error(t, err) {
 			assert.Equal(t, http.StatusConflict, res.StatusCode)
+			assert.ErrorIs(t, err, exception.ErrUrlIdDuplicate)
+		}
+	})
+	t.Run("given a valid request, searching the database returns an error, then returns 500", func(t *testing.T) {
+		target := "/api/v1/shortener"
+
+		requestString := request.RandomUrlShortenerRequestCreate().String()
+
+		e := echoServer()
+		req := httptest.NewRequest(http.MethodPost, target, strings.NewReader(requestString))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+
+		ctx := e.NewContext(req, rec)
+
+		mockRepository := storagemocks.NewUrlShortenerRepository(t)
+		mockRepository.
+			On("FindById", context.Background(), mock.AnythingOfType("vo.UrlId")).
+			Return(domain.UrlShortener{}, exception.ErrDataBase)
+
+		eventBusInMemory := inmemoryBus.NewEventBusInMemory()
+		commandBusInMemory := inmemoryBus.NewCommandBusMemory()
+
+		createService := creating.NewCreateApplicationService(mockRepository, eventBusInMemory)
+		queryBusInMemory := inmemoryBus.NewQueryBusMemory()
+
+		createCommandHandler := creating.NewCreateUrlShortenerCommandHandler(createService)
+
+		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		err := urlShortenerController.Create(ctx)
+
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if assert.Error(t, err) {
+			assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+			assert.ErrorIs(t, err, exception.ErrDataBase)
+		}
+	})
+	t.Run("given a valid request, saving to the database returns an error, then returns 500", func(t *testing.T) {
+		target := "/api/v1/shortener"
+
+		requestString := request.RandomUrlShortenerRequestCreate().String()
+
+		e := echoServer()
+		req := httptest.NewRequest(http.MethodPost, target, strings.NewReader(requestString))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+
+		ctx := e.NewContext(req, rec)
+
+		mockRepository := storagemocks.NewUrlShortenerRepository(t)
+		mockRepository.
+			On("FindById", context.Background(), mock.AnythingOfType("vo.UrlId")).
+			Return(domain.UrlShortener{}, nil)
+		mockRepository.
+			On("Create", context.Background(), mock.AnythingOfType("domain.UrlShortener")).
+			Return(exception.ErrDataBase)
+
+		eventBusInMemory := inmemoryBus.NewEventBusInMemory()
+		commandBusInMemory := inmemoryBus.NewCommandBusMemory()
+
+		createService := creating.NewCreateApplicationService(mockRepository, eventBusInMemory)
+		queryBusInMemory := inmemoryBus.NewQueryBusMemory()
+
+		createCommandHandler := creating.NewCreateUrlShortenerCommandHandler(createService)
+
+		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		err := urlShortenerController.Create(ctx)
+
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if assert.Error(t, err) {
+			assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+			assert.ErrorIs(t, err, exception.ErrDataBase)
 		}
 	})
 }

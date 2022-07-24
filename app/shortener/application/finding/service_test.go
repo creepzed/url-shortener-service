@@ -31,7 +31,6 @@ func TestFindApplicationService(t *testing.T) {
 		assert.ErrorIs(t, err, exception.ErrInvalidUrlId)
 		assert.Nil(t, result)
 	})
-
 	t.Run("given a valid url, not found returns error", func(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
@@ -49,9 +48,8 @@ func TestFindApplicationService(t *testing.T) {
 
 		assert.Error(t, err)
 		assert.ErrorIs(t, err, exception.ErrUrlNotFound)
-		assert.Equal(t, domain.UrlShortener{}, result)
+		assert.Equal(t, nil, result)
 	})
-
 	t.Run("given a valid url, return an error in the database", func(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
@@ -69,9 +67,8 @@ func TestFindApplicationService(t *testing.T) {
 
 		assert.Error(t, err)
 		assert.ErrorIs(t, err, exception.ErrDataBase)
-		assert.Equal(t, domain.UrlShortener{}, result)
+		assert.Equal(t, nil, result)
 	})
-
 	t.Run("given a valid url, return an error in the transformer", func(t *testing.T) {
 		urlId := randomvalues.RandomUrlId()
 		query := NewFindUrlShortenerQuery(urlId)
@@ -92,9 +89,8 @@ func TestFindApplicationService(t *testing.T) {
 
 		assert.Error(t, err)
 		assert.ErrorIs(t, err, exception.ErrTransforming)
-		assert.Equal(t, domain.UrlShortener{}, result)
+		assert.Equal(t, nil, result)
 	})
-
 	t.Run("given a valid url, return data", func(t *testing.T) {
 		urlId := randomvalues.RandomUrlId()
 		query := NewFindUrlShortenerQuery(urlId)

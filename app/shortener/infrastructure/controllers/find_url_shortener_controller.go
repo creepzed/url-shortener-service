@@ -9,15 +9,17 @@ import (
 	"net/http"
 )
 
-func (ctrl *createUrlShortenerController) Find(c echo.Context) (err error) {
+func (ctrl *urlShortenerController) Find(c echo.Context) (err error) {
 	urlId := c.Param("url_id")
 
 	if len(urlId) == 0 {
 		c.JSON(http.StatusBadRequest, echo.Map{"message": "no parameter in request"})
+		return exception.ErrInvalidUrlId
 	}
 
 	if err := vo.IsValidUrlId(urlId); err != nil {
 		c.JSON(http.StatusBadRequest, echo.Map{"message": err.Error()})
+		return err
 	}
 
 	qry := finding.NewFindUrlShortenerQuery(urlId)
@@ -25,6 +27,7 @@ func (ctrl *createUrlShortenerController) Find(c echo.Context) (err error) {
 	result, err := ctrl.queryBus.Execute(c.Request().Context(), qry)
 	if err != nil {
 		codeErr := http.StatusInternalServerError
+
 		switch {
 		case errors.Is(err, exception.ErrInvalidUrlId):
 			codeErr = http.StatusBadRequest
