@@ -27,13 +27,13 @@ func TestUpdateUrlShortener(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
 		urlShortener := domain.RandomUrlShortener(urlId, vo.Enabled)
-
-		requestUpdate := request.RandomUpdateRequest(urlId, vo.Enabled).String()
+		auxEnabled := urlShortener.IsEnabled().Value()
+		requestUpdate := request.RandomUpdateRequest(urlId, &auxEnabled).String()
 
 		target := "/api/v1/shortener/"
 
 		e := echoServer()
-		req := httptest.NewRequest(http.MethodPut, target, strings.NewReader(requestUpdate))
+		req := httptest.NewRequest(http.MethodPatch, target, strings.NewReader(requestUpdate))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 
@@ -72,12 +72,13 @@ func TestUpdateUrlShortener(t *testing.T) {
 	t.Run("given a invalid Url Short, It is not update and returns 400", func(t *testing.T) {
 
 		urlId := randomvalues.InvalidUrlId()
-		requestUpdate := request.RandomUpdateRequest(urlId, vo.Enabled).String()
+		auxEnabled := vo.Enabled
+		requestUpdate := request.RandomUpdateRequest(urlId, &auxEnabled).String()
 
 		target := "/api/v1/shortener/"
 
 		e := echoServer()
-		req := httptest.NewRequest(http.MethodPut, target, strings.NewReader(requestUpdate))
+		req := httptest.NewRequest(http.MethodPatch, target, strings.NewReader(requestUpdate))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 
@@ -110,12 +111,13 @@ func TestUpdateUrlShortener(t *testing.T) {
 	t.Run("given a valid Url Short, It is not found returns 404", func(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
-		requestUpdate := request.RandomUpdateRequest(urlId, vo.Enabled).String()
+		auxEnabled := vo.Enabled
+		requestUpdate := request.RandomUpdateRequest(urlId, &auxEnabled).String()
 
 		target := "/api/v1/shortener/"
 
 		e := echoServer()
-		req := httptest.NewRequest(http.MethodPut, target, strings.NewReader(requestUpdate))
+		req := httptest.NewRequest(http.MethodPatch, target, strings.NewReader(requestUpdate))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 
@@ -151,12 +153,13 @@ func TestUpdateUrlShortener(t *testing.T) {
 	t.Run("given a valid short url, when searching the database returns an error, it returns 500", func(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
-		requestUpdate := request.RandomUpdateRequest(urlId, vo.Enabled).String()
+		auxEnabled := vo.Enabled
+		requestUpdate := request.RandomUpdateRequest(urlId, &auxEnabled).String()
 
 		target := "/api/v1/shortener/"
 
 		e := echoServer()
-		req := httptest.NewRequest(http.MethodPut, target, strings.NewReader(requestUpdate))
+		req := httptest.NewRequest(http.MethodPatch, target, strings.NewReader(requestUpdate))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 
@@ -193,12 +196,13 @@ func TestUpdateUrlShortener(t *testing.T) {
 	t.Run("given a empty Url Short, It is not update and returns 400", func(t *testing.T) {
 
 		urlId := ""
-		requestUpdate := request.RandomUpdateRequest(urlId, vo.Enabled).String()
+		auxEnabled := vo.Enabled
+		requestUpdate := request.RandomUpdateRequest(urlId, &auxEnabled).String()
 
 		target := "/api/v1/shortener/"
 
 		e := echoServer()
-		req := httptest.NewRequest(http.MethodPut, target, strings.NewReader(requestUpdate))
+		req := httptest.NewRequest(http.MethodPatch, target, strings.NewReader(requestUpdate))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 
@@ -228,15 +232,15 @@ func TestUpdateUrlShortener(t *testing.T) {
 			assert.ErrorIs(t, err, exception.ErrInvalidUrlId)
 		}
 	})
-	t.Run("given a invalid body, It is not update and returns 400", func(t *testing.T) {
+	t.Run("given a empty body Url Short, It is not update and returns 400", func(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
-		requestUpdate := "&&&&&&"
+		requestUpdate := ""
 
 		target := "/api/v1/shortener/"
 
 		e := echoServer()
-		req := httptest.NewRequest(http.MethodPut, target, strings.NewReader(requestUpdate))
+		req := httptest.NewRequest(http.MethodPatch, target, strings.NewReader(requestUpdate))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 
@@ -263,7 +267,46 @@ func TestUpdateUrlShortener(t *testing.T) {
 
 		if assert.Error(t, err) {
 			assert.Equal(t, http.StatusBadRequest, rec.Code)
-			assert.ErrorIs(t, err, ErrInvalidBodyRequest)
+			assert.ErrorIs(t, err, ErrInvalidRequestBody)
+		}
+	})
+
+	t.Run("given a invalid body, It is not update and returns 400", func(t *testing.T) {
+
+		urlId := randomvalues.RandomUrlId()
+		requestUpdate := "&&&&&&"
+
+		target := "/api/v1/shortener/"
+
+		e := echoServer()
+		req := httptest.NewRequest(http.MethodPatch, target, strings.NewReader(requestUpdate))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+
+		ctx := e.NewContext(req, rec)
+		ctx.SetPath(fmt.Sprintf("%s/:url_id", target))
+		ctx.SetParamNames("url_id")
+		ctx.SetParamValues(urlId)
+
+		mockRepository := storagemocks.NewUrlShortenerRepository(t)
+
+		commandBusInMemory := inmemoryBus.NewCommandBusMemory()
+		queryBusInMemory := inmemoryBus.NewQueryBusMemory()
+		eventBusInMemory := inmemoryBus.NewEventBusInMemory()
+
+		updateService := updating.NewUpdateApplicationService(mockRepository, eventBusInMemory)
+		updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
+		commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		err := urlShortenerController.Update(ctx)
+
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if assert.Error(t, err) {
+			assert.Equal(t, http.StatusBadRequest, rec.Code)
+			assert.ErrorIs(t, err, ErrInvalidRequestBody)
 		}
 	})
 }

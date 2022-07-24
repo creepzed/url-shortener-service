@@ -155,7 +155,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		if assert.Error(t, err) {
 			assert.Equal(t, http.StatusBadRequest, res.StatusCode)
-			assert.ErrorIs(t, err, ErrInvalidBodyRequest)
+			assert.ErrorIs(t, err, ErrInvalidRequestBody)
 		}
 	})
 	t.Run("given the duplicate UrlId returns 409", func(t *testing.T) {

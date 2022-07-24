@@ -16,7 +16,7 @@ func (ctrl *urlShortenerController) Create(c echo.Context) (err error) {
 
 	if err := c.Bind(request); err != nil {
 		c.JSON(http.StatusBadRequest, echo.Map{"message": err.Error()})
-		return fmt.Errorf("%w: %s", ErrInvalidBodyRequest, err.Error())
+		return fmt.Errorf("%w: %s", ErrInvalidRequestBody, err.Error())
 	}
 
 	if err = c.Validate(request); err != nil {
