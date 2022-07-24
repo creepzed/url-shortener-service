@@ -60,6 +60,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		if assert.NoError(t, err) {
 			assert.Equal(t, http.StatusCreated, rec.Code)
+			assert.NotNil(t, rec.Body)
 		}
 	})
 	t.Run("given an invalid request when the origin url is wrong, then returns 400 with an error message", func(t *testing.T) {
