@@ -13,7 +13,7 @@ type urlShortenerController struct {
 }
 
 var (
-	ErrInvalidBodyRequest = errors.New("the request body is invalid")
+	ErrInvalidRequestBody = errors.New("the request body is invalid")
 )
 
 func NewUrlShortenerController(e *echo.Echo, commandBus command.CommandBus, queryBus query.QueryBus) *urlShortenerController {
@@ -28,7 +28,7 @@ func NewUrlShortenerController(e *echo.Echo, commandBus command.CommandBus, quer
 		{
 			subGroup.POST("", controller.Create)
 			subGroup.GET("/:url_id", controller.Find)
-			subGroup.PUT("/:url_id", controller.Update)
+			subGroup.PATCH("/:url_id", controller.Update)
 		}
 	}
 	return controller

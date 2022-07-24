@@ -28,10 +28,15 @@ func (ctrl *urlShortenerController) Update(c echo.Context) (err error) {
 
 	if err := c.Bind(request); err != nil {
 		c.JSON(http.StatusBadRequest, echo.Map{"message": err.Error()})
-		return fmt.Errorf("%w: %s", ErrInvalidBodyRequest, err.Error())
+		return fmt.Errorf("%w: %s", ErrInvalidRequestBody, err.Error())
 	}
 
-	cmd := updating.NewUpdateUrlShortenerCommand(urlId, &request.IsEnabled, request.OriginalUrl, request.UserId)
+	if request.IsEnabled == nil && request.OriginalUrl == "" && request.UserId == "" {
+		c.JSON(http.StatusBadRequest, echo.Map{"message": "request body cannot be empty"})
+		return ErrInvalidRequestBody
+	}
+
+	cmd := updating.NewUpdateUrlShortenerCommand(urlId, request.IsEnabled, request.OriginalUrl, request.UserId)
 
 	err = ctrl.commandBus.Dispatch(c.Request().Context(), cmd)
 	if err != nil {
