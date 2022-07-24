@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/creating"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/exception"
+	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/randomvalues"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers/request"
+	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers/response"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -50,6 +52,11 @@ func (ctrl *urlShortenerController) Create(c echo.Context) (err error) {
 		c.JSON(codeErr, echo.Map{"message": err.Error()})
 		return err
 	}
-
-	return c.NoContent(http.StatusCreated)
+	resp := response.OutputResponse{
+		UrlId:       urlId,
+		IsEnabled:   vo.Enabled,
+		OriginalUrl: request.OriginalUrl,
+		UserId:      request.UserId,
+	}
+	return c.JSON(http.StatusCreated, resp)
 }

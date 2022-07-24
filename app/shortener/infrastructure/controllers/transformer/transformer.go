@@ -14,7 +14,7 @@ func NewTransformer() transformer {
 
 func (t transformer) Transform(urlShortener domain.UrlShortener) (interface{}, error) {
 
-	anUrlShortener := response.UrlShortenerResponse{
+	anUrlShortener := response.OutputResponse{
 		UrlId:       urlShortener.UrlId().Value(),
 		IsEnabled:   urlShortener.IsEnabled().Value(),
 		OriginalUrl: urlShortener.OriginalUrl().Value(),
