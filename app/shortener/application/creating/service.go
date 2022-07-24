@@ -15,11 +15,11 @@ type CreateApplicationService interface {
 }
 
 type createApplicationService struct {
-	repository repository.UrlShortenerRepository
+	repository repository.CreateAndFindRepository
 	eventBus   event.EventBus
 }
 
-func NewCreateApplicationService(repository repository.UrlShortenerRepository, eventBus event.EventBus) *createApplicationService {
+func NewCreateApplicationService(repository repository.CreateAndFindRepository, eventBus event.EventBus) *createApplicationService {
 	return &createApplicationService{
 		repository: repository,
 		eventBus:   eventBus,
@@ -33,7 +33,11 @@ func (cas createApplicationService) Do(ctx context.Context, command CreateUrlSho
 		return err
 	}
 
-	existUrl, _ := cas.repository.FindById(ctx, urlId)
+	existUrl, err := cas.repository.FindById(ctx, urlId)
+	if err != nil {
+		return fmt.Errorf("%w :%s", exception.ErrDataBase, err.Error())
+	}
+
 	if existUrl.UrlId().Value() != "" {
 		return fmt.Errorf("%w: %s", exception.ErrUrlIdDuplicate, urlId.Value())
 	}

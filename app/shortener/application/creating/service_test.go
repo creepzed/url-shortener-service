@@ -137,6 +137,25 @@ func TestCreateApplicationService(t *testing.T) {
 		assert.ErrorIs(t, err, exception.ErrDataBase)
 	})
 
+	t.Run("When receiving a valid create url shortener command, but return an find error on database ", func(t *testing.T) {
+		command := NewCreateUrlShortenerCommand(randomvalues.RandomUrlId(), randomvalues.RandomOriginalUrl(), randomvalues.RandomUserId())
+
+		mockRepository := storagemocks.NewUrlShortenerRepository(t)
+	
+		mockRepository.
+			On("FindById", context.Background(), mock.AnythingOfType("vo.UrlId")).
+			Return(domain.UrlShortener{}, exception.ErrDataBase)
+
+		mockEventBus := eventmocks.NewEventBus(t)
+
+		service := NewCreateApplicationService(mockRepository, mockEventBus)
+
+		err := service.Do(context.Background(), command)
+
+		require.Error(t, err)
+		assert.ErrorIs(t, err, exception.ErrDataBase)
+	})
+
 	t.Run("When receiving a valid create url shortener command, but return an save error on eventbus ", func(t *testing.T) {
 		command := NewCreateUrlShortenerCommand(randomvalues.RandomUrlId(), randomvalues.RandomOriginalUrl(), randomvalues.RandomUserId())
 

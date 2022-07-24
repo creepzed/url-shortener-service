@@ -53,6 +53,20 @@ func (_m *UrlShortenerRepository) FindById(ctx context.Context, urlId vo.UrlId) 
 	return r0, r1
 }
 
+// Update provides a mock function with given fields: ctx, urlShortener
+func (_m *UrlShortenerRepository) Update(ctx context.Context, urlShortener domain.UrlShortener) error {
+	ret := _m.Called(ctx, urlShortener)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, domain.UrlShortener) error); ok {
+		r0 = rf(ctx, urlShortener)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // NewUrlShortenerRepository creates a new instance of UrlShortenerRepository. It also registers the testing.TB interface on the mock and a cleanup function to assert the mocks expectations.
 func NewUrlShortenerRepository(t testing.TB) *UrlShortenerRepository {
 	mock := &UrlShortenerRepository{}

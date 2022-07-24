@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-const ShortenerCreatedEventType event.Type = "event.url.shortener.created"
+const ShortenerUpdatedEventType event.Type = "event.url.shortener.updated"
 
-type ShortenerCreatedEvent struct {
+type ShortenerUpdatedEvent struct {
 	urlId       string
 	urlStatus   bool
 	originalUrl string
@@ -17,8 +17,8 @@ type ShortenerCreatedEvent struct {
 	BaseEvent
 }
 
-func NewShortenerCreatedEvent(urlId string, urlStatus bool, originalUrl string, userId string) ShortenerCreatedEvent {
-	return ShortenerCreatedEvent{
+func NewShortenerUpdatedEvent(urlId string, urlStatus bool, originalUrl string, userId string) ShortenerUpdatedEvent {
+	return ShortenerUpdatedEvent{
 		urlId:       urlId,
 		urlStatus:   urlStatus,
 		originalUrl: originalUrl,
@@ -27,29 +27,30 @@ func NewShortenerCreatedEvent(urlId string, urlStatus bool, originalUrl string, 
 	}
 }
 
-func (sce ShortenerCreatedEvent) Type() event.Type {
-	return ShortenerCreatedEventType
+func (sce ShortenerUpdatedEvent) Type() event.Type {
+	return ShortenerUpdatedEventType
 }
 
-func (sce ShortenerCreatedEvent) UrlId() string {
+func (sce ShortenerUpdatedEvent) UrlId() string {
 	return sce.urlId
 }
 
-func (sce ShortenerCreatedEvent) UrlStatus() bool {
+func (sce ShortenerUpdatedEvent) UrlStatus() bool {
 	return sce.urlStatus
 }
 
-func (sce ShortenerCreatedEvent) OriginalUrl() string {
+func (sce ShortenerUpdatedEvent) OriginalUrl() string {
 	return sce.originalUrl
 }
 
-func (sce ShortenerCreatedEvent) UserId() string {
+func (sce ShortenerUpdatedEvent) UserId() string {
 	return sce.userId
 }
 
-func (sce ShortenerCreatedEvent) MarshalJSON() ([]byte, error) {
+func (sce ShortenerUpdatedEvent) MarshalJSON() ([]byte, error) {
 	j, err := json.Marshal(&struct {
 		EventId     string    `json:"eventId"`
+		EventType   string    `json:"event_type"`
 		AggregateId string    `json:"aggregate_id"`
 		OccurredOn  time.Time `json:"occurred_on"`
 		UrlId       string    `json:"url_id"`
@@ -58,6 +59,7 @@ func (sce ShortenerCreatedEvent) MarshalJSON() ([]byte, error) {
 		UserId      string    `json:"user_id"`
 	}{
 		EventId:     sce.eventID,
+		EventType:   string(sce.Type()),
 		AggregateId: sce.aggregateID,
 		OccurredOn:  sce.occurredOn,
 		UrlId:       sce.urlId,
@@ -73,9 +75,10 @@ func (sce ShortenerCreatedEvent) MarshalJSON() ([]byte, error) {
 	return j, err
 }
 
-func (sce ShortenerCreatedEvent) UnmarshalJSON(b []byte) error {
+func (sce ShortenerUpdatedEvent) UnmarshalJSON(b []byte) error {
 	var value struct {
 		EventId     string    `json:"eventId"`
+		EventType   string    `json:"event_type"`
 		AggregateId string    `json:"aggregate_id"`
 		OccurredOn  time.Time `json:"occurred_on"`
 		UrlId       string    `json:"url_id"`

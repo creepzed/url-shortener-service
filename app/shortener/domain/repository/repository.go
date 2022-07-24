@@ -13,8 +13,31 @@ type KeyGenerateService interface {
 //go:generate mockery --case=snake --outpkg=storagemocks --output=../mocks/storagemocks --name=KeyGenerateService
 
 type UrlShortenerRepository interface {
-	Create(ctx context.Context, urlShortener domain.UrlShortener) error
-	FindById(ctx context.Context, urlId vo.UrlId) (domain.UrlShortener, error)
+	CreateUrlShortenerRepository
+	FindByIdUrlShortenerRepository
+	UpdateUrlShortenerRepository
+}
+
+type CreateAndFindRepository interface {
+	CreateUrlShortenerRepository
+	FindByIdUrlShortenerRepository
+}
+
+type UpdateAndFindRepository interface {
+	UpdateUrlShortenerRepository
+	FindByIdUrlShortenerRepository
 }
 
 //go:generate mockery --case=snake --outpkg=storagemocks --output=../mocks/storagemocks --name=UrlShortenerRepository
+
+type CreateUrlShortenerRepository interface {
+	Create(ctx context.Context, urlShortener domain.UrlShortener) error
+}
+
+type FindByIdUrlShortenerRepository interface {
+	FindById(ctx context.Context, urlId vo.UrlId) (domain.UrlShortener, error)
+}
+
+type UpdateUrlShortenerRepository interface {
+	Update(ctx context.Context, urlShortener domain.UrlShortener) error
+}
