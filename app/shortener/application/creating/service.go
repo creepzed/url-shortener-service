@@ -2,6 +2,7 @@ package creating
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/creepzed/url-shortener-service/app/shared/application/event"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
@@ -35,7 +36,9 @@ func (cas createApplicationService) Do(ctx context.Context, command CreateUrlSho
 
 	existUrl, err := cas.repository.FindById(ctx, urlId)
 	if err != nil {
-		return fmt.Errorf("%w :%s", exception.ErrDataBase, err.Error())
+		if !errors.Is(err, exception.ErrUrlNotFound) {
+			return fmt.Errorf("%w :%s", exception.ErrDataBase, err.Error())
+		}
 	}
 
 	if existUrl.UrlId().Value() != "" {
