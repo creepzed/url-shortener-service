@@ -12,6 +12,7 @@ import (
 	"github.com/creepzed/url-shortener-service/app/shortener/application/updating"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers/transformer"
+	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/queue/eventbus"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/queue/kafka/common"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/queue/kafka/producer"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/cache"
@@ -44,6 +45,7 @@ var (
 	kafkaBrokers  = strings.Split(os.Getenv("KAFKA_BROKERS"), ",")
 
 	statisticsTopic = os.Getenv("KAFKA_STATISTICS_TOPIC")
+	shortenerEvent  = os.Getenv("KAFKA_SHORTENER_EVENT_TOPIC")
 )
 
 func main() {
@@ -57,11 +59,11 @@ func main() {
 
 	repositoryCache := cache.NewCache(repositoryMongo, repositoryRedis)
 
+	producerQueue := producer.NewKafkaPublisher(common.GetDialer(kafkaUsername, kafkaPassword), kafkaBrokers...)
+
 	commandBusInMemory := inmemory.NewCommandBusMemory()
 	queryBusInMemory := inmemory.NewQueryBusMemory()
-	eventBusInMemory := inmemory.NewEventBusInMemory()
-
-	producerQueue := producer.NewKafkaPublisher(common.GetDialer(kafkaUsername, kafkaPassword), kafkaBrokers...)
+	eventBusInMemory := eventbus.NewEventBusKafka(producerQueue, shortenerEvent)
 
 	createService := creating.NewCreateApplicationService(repositoryMongo, eventBusInMemory)
 

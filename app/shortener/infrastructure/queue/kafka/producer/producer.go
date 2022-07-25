@@ -27,10 +27,10 @@ func NewKafkaPublisher(kafkaDialer *kafka.Dialer, brokers ...string) *publisher 
 func (p *publisher) getKafkaWriter(topic string) *kafka.Writer {
 	if p.kafkaWriters[topic] == nil {
 		p.kafkaWriters[topic] = &kafka.Writer{
-			Addr:  kafka.TCP(p.brokers...),
-			Topic: topic,
-			//Balancer: &kafka.Hash{},
-			Balancer:    &kafka.LeastBytes{},
+			Addr:     kafka.TCP(p.brokers...),
+			Topic:    topic,
+			Balancer: &kafka.Hash{},
+			//Balancer:    &kafka.LeastBytes{},
 			Compression: compress.Snappy,
 			Logger:      log.Logger(),
 			ErrorLogger: log.Logger(),
