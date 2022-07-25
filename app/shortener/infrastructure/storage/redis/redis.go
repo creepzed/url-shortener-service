@@ -21,7 +21,7 @@ func NewUrlShortenerRedis(urlShortener domain.UrlShortener) *UrlShortenerRedis {
 		UrlId:       urlShortener.UrlId().Value(),
 		UrlEnable:   urlShortener.IsEnabled().Value(),
 		OriginalUrl: urlShortener.OriginalUrl().Value(),
-		UserId:      urlShortener.UrlId().Value(),
+		UserId:      urlShortener.UserId().Value(),
 	}
 }
 
