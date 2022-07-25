@@ -18,6 +18,7 @@ import (
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/cache"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/mongo"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/redis"
+	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/subscriber"
 	"net/http"
 	"os"
 	"os/signal"
@@ -43,6 +44,7 @@ var (
 	kafkaUsername = os.Getenv("KAFKA_USERNAME")
 	kafkaPassword = os.Getenv("KAFKA_PASSWORD")
 	kafkaBrokers  = strings.Split(os.Getenv("KAFKA_BROKERS"), ",")
+	kafkaGroupId  = os.Getenv("KAFKA_GROUP_ID")
 
 	statisticsTopic = os.Getenv("KAFKA_STATISTICS_TOPIC")
 	shortenerEvent  = os.Getenv("KAFKA_SHORTENER_EVENT_TOPIC")
@@ -55,6 +57,8 @@ func main() {
 	repositoryMongo := mongo.NewUrlShortenerRepositoryMongo(mongodbConn, dbTimeOut)
 
 	redisConn := redisdb.NewRedisDBConnection(redisAddr, redisPassword, redisDB)
+	repositoryRedisCache := redisdb.NewRepositoryRedis(redisConn, dbTimeOut)
+
 	repositoryRedis := redis.NewUrlShortenerRepositoryRedis(redisConn, dbTimeOut)
 
 	repositoryCache := cache.NewCache(repositoryMongo, repositoryRedis)
@@ -91,6 +95,11 @@ func main() {
 
 	controllers.NewUrlShortenerController(server, commandBusInMemory, queryBusInMemory)
 
+	subscriberCache := subscriber.NewSubscriberUpdateCache(repositoryRedisCache, kafkaGroupId, shortenerEvent, common.GetDialer(kafkaUsername, kafkaPassword), kafkaBrokers...)
+	ctxSubscriberCache, cancelSubscriber := context.WithCancel(context.Background())
+	defer cancelSubscriber()
+	go subscriberCache.ReadMessage(ctxSubscriberCache)
+
 	go func() {
 		if err := server.StartServer(rest.Setup(host, port)); err != http.ErrServerClosed {
 			server.Logger.Fatal("shutting down the server")
@@ -101,9 +110,9 @@ func main() {
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctxServer, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if err := server.Shutdown(ctx); err != nil {
+	if err := server.Shutdown(ctxServer); err != nil {
 		server.Logger.Fatal(err)
 	}
 
