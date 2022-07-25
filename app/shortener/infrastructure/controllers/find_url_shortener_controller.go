@@ -22,7 +22,15 @@ func (ctrl *urlShortenerController) Find(c echo.Context) (err error) {
 		return err
 	}
 
-	qry := finding.NewFindUrlShortenerQuery(urlId)
+	metadata := finding.Metadata{
+		"Header":    c.Request().Header,
+		"Method":    c.Request().Method,
+		"Uri":       c.Request().RequestURI,
+		"Host":      c.Request().Host,
+		"Remote_ip": c.RealIP(),
+	}
+
+	qry := finding.NewFindUrlShortenerQuery(urlId, metadata)
 
 	result, err := ctrl.queryBus.Execute(c.Request().Context(), qry)
 	if err != nil {

@@ -13,7 +13,7 @@ func TestFindUrlShortenerQuery(t *testing.T) {
 
 		commandType := FindUrlShortenerQueryType
 
-		qry := NewFindUrlShortenerQuery(urlId)
+		qry := NewFindUrlShortenerQuery(urlId, nil)
 
 		assert.Equal(t, qry.Type(), commandType)
 		assert.Equal(t, qry.UrlId(), urlId)

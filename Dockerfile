@@ -10,19 +10,22 @@ RUN mkdir -p $GOPATH/src/github.com/creepzed/url-shortener-service
 WORKDIR $GOPATH/src/github.com/creepzed/url-shortener-service
 
 COPY go.mod .
+COPY go.sum .
 COPY app/ app/
 
-RUN go mod tidy
 RUN go mod vendor
 
-RUN CGO_ENABLED=0 GOOS=linux go build -mod=vendor -a -installsuffix cgo -ldflags '-extldflags "-static"' -o $GOBIN/main ./app/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -mod=vendor -a \
+    -installsuffix cgo -ldflags '-extldflags "-static"'\
+     -o $GOBIN/main ./app/main.go
 
 # Runtime image with scratch container
-FROM scratch
+FROM scratch as production
 ARG VERSION
 ENV VERSION_APP=$VERSION
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /go/bin/ /app/
 
+EXPOSE 8080
 ENTRYPOINT ["/app/main"]

@@ -1,45 +1,49 @@
 version: '3.8'
 
 services:
-#  golang:
+
+#  api:
 #    env_file:
 #      - .env
 #    build:
 #      context: ./
 #      target: production
-#    image: golang:url-shorterner
+#    links:
+#      - mongo:mongo
+#      - redis:redis
+#      - kafka:kafka
+#    image: golang:url-shorterner-service
 #    command: go run app/main.go
 #    restart: always
 #    ports:
-#      - "4000:8080"
+#      - "8080:8080"
 
   zookeeper:
-    image: zookeeper:3.8.0
-    hostname: zookeeper
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - "2181:2181"
+      - '22181:2181'
 
   kafka:
-    image: confluentinc/cp-kafka:6.2.0
-    hostname: broker
-    container_name: broker
+    image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     ports:
-      - "29092:29092"
+      - '29092:29092'
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TOPIC_AUTO_CREATE: 1
 
   mongo:
-    restart: always
     image: mongo:4.4
+    restart: always
     ports:
       - '27017:27017'
     volumes:
@@ -52,6 +56,16 @@ services:
       - '6379:6379'
     volumes:
       - cache:/data
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    restart: always
+    ports:
+      - '8088:8080'
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
 volumes:
   cache:
   mongodb:
