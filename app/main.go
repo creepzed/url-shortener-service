@@ -5,6 +5,7 @@ import (
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/inmemory"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/rest"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage/mongodb"
+	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage/redisdb"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/creating"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/finding"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/reporting"
@@ -13,7 +14,9 @@ import (
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers/transformer"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/queue/kafka/common"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/queue/kafka/producer"
+	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/cache"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/mongo"
+	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/redis"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,9 +35,9 @@ var (
 	mongoDBName       = os.Getenv("MONGODB_DATABASE")
 	mongoDBCollection = os.Getenv("MONGODB_COLLECTION")
 
-	//redisAddr     = os.Getenv("REDIS_ADDR")
-	//redisPassword = os.Getenv("REDIS_PASSWORD")
-	//redisDB       = os.Getenv("REDIS_DB")
+	redisAddr     = os.Getenv("REDIS_ADDR")
+	redisPassword = os.Getenv("REDIS_PASSWORD")
+	redisDB       = os.Getenv("REDIS_DB")
 
 	kafkaUsername = os.Getenv("KAFKA_USERNAME")
 	kafkaPassword = os.Getenv("KAFKA_PASSWORD")
@@ -49,8 +52,10 @@ func main() {
 	mongodbConn := mongodb.NewMongoDBConnection(mongoDBURI, mongoDBName, mongoDBCollection)
 	repositoryMongo := mongo.NewUrlShortenerRepositoryMongo(mongodbConn, dbTimeOut)
 
-	//redisConn := redisdb.NewRedisDBConnection(redisAddr, redisPassword, redisDB)
-	//repositoryRedis := redis.NewUrlShortenerRepositoryRedis(redisConn, dbTimeOut)
+	redisConn := redisdb.NewRedisDBConnection(redisAddr, redisPassword, redisDB)
+	repositoryRedis := redis.NewUrlShortenerRepositoryRedis(redisConn, dbTimeOut)
+
+	repositoryCache := cache.NewCache(repositoryMongo, repositoryRedis)
 
 	commandBusInMemory := inmemory.NewCommandBusMemory()
 	queryBusInMemory := inmemory.NewQueryBusMemory()
@@ -66,7 +71,7 @@ func main() {
 
 	transform := transformer.NewTransformer()
 
-	findService := finding.NewFindApplicationService(repositoryMongo, transform)
+	findService := finding.NewFindApplicationService(repositoryCache, transform)
 
 	reportWrapService := reporting.NewReportApplicationService(findService, producerQueue, statisticsTopic)
 
