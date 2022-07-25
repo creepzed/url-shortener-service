@@ -14,6 +14,8 @@ type FindApplicationService interface {
 	Do(ctx context.Context, query FindUrlShortenerQuery) (query.Result, error)
 }
 
+//go:generate mockery --case=snake --outpkg=servicemocks --output=../mocks/servicemocks --name=FindApplicationService
+
 type findApplicationService struct {
 	repository  repository.FindByIdUrlShortenerRepository
 	transformer transformer.UrlShortenerTransformer

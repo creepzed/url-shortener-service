@@ -1,21 +1,28 @@
 package main
 
 import (
+	"context"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/inmemory"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/rest"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage/mongodb"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/creating"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/finding"
+	"github.com/creepzed/url-shortener-service/app/shortener/application/reporting"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/updating"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers/transformer"
+	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/queue/kafka/common"
+	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/queue/kafka/producer"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/storage/mongo"
+	"net/http"
 	"os"
+	"os/signal"
+	"strings"
 	"time"
 )
 
 const (
-	host      = "localhost"
+	host      = ""
 	port      = 8080
 	dbTimeOut = 5 * time.Second
 )
@@ -28,6 +35,12 @@ var (
 	//redisAddr     = os.Getenv("REDIS_ADDR")
 	//redisPassword = os.Getenv("REDIS_PASSWORD")
 	//redisDB       = os.Getenv("REDIS_DB")
+
+	kafkaUsername = os.Getenv("KAFKA_USERNAME")
+	kafkaPassword = os.Getenv("KAFKA_PASSWORD")
+	kafkaBrokers  = strings.Split(os.Getenv("KAFKA_BROKERS"), ",")
+
+	statisticsTopic = os.Getenv("KAFKA_STATISTICS_TOPIC")
 )
 
 func main() {
@@ -43,6 +56,8 @@ func main() {
 	queryBusInMemory := inmemory.NewQueryBusMemory()
 	eventBusInMemory := inmemory.NewEventBusInMemory()
 
+	producerQueue := producer.NewKafkaPublisher(common.GetDialer(kafkaUsername, kafkaPassword), kafkaBrokers...)
+
 	createService := creating.NewCreateApplicationService(repositoryMongo, eventBusInMemory)
 
 	createCommandHandler := creating.NewCreateUrlShortenerCommandHandler(createService)
@@ -52,7 +67,15 @@ func main() {
 	transform := transformer.NewTransformer()
 
 	findService := finding.NewFindApplicationService(repositoryMongo, transform)
-	findQueryHandler := finding.NewFindUrlShortenerQueryHandler(findService)
+
+	reportWrapService := reporting.NewReportApplicationService(findService, producerQueue, statisticsTopic)
+
+	ctxObserver, cancelObserver := context.WithCancel(context.Background())
+	defer cancelObserver()
+	go reportWrapService.Observer(ctxObserver)
+
+	findQueryHandler := finding.NewFindUrlShortenerQueryHandler(reportWrapService)
+
 	queryBusInMemory.Register(finding.FindUrlShortenerQueryType, findQueryHandler)
 
 	updateService := updating.NewUpdateApplicationService(repositoryMongo, eventBusInMemory)
@@ -61,5 +84,20 @@ func main() {
 
 	controllers.NewUrlShortenerController(server, commandBusInMemory, queryBusInMemory)
 
-	server.Logger.Fatal(server.StartServer(rest.Setup(host, port)))
+	go func() {
+		if err := server.StartServer(rest.Setup(host, port)); err != http.ErrServerClosed {
+			server.Logger.Fatal("shutting down the server")
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		server.Logger.Fatal(err)
+	}
+
 }

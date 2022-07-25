@@ -20,7 +20,7 @@ func TestFindUrlShortenerQueryHandler(t *testing.T) {
 	t.Run("given a valid registered query it is executed", func(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
-		query := NewFindUrlShortenerQuery(urlId)
+		query := NewFindUrlShortenerQuery(urlId, nil)
 		urlExpected := domain.RandomUrlShortener(urlId, vo.Enabled)
 
 		responseExpected := struct {

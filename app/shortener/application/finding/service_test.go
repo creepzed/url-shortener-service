@@ -18,7 +18,7 @@ func TestFindApplicationService(t *testing.T) {
 	t.Parallel()
 	t.Run("given an invalid url, it should return the invalid url error", func(t *testing.T) {
 
-		query := NewFindUrlShortenerQuery(randomvalues.InvalidUrlId())
+		query := NewFindUrlShortenerQuery(randomvalues.InvalidUrlId(), nil)
 
 		mockRepository := storagemocks.NewUrlShortenerRepository(t)
 
@@ -34,7 +34,7 @@ func TestFindApplicationService(t *testing.T) {
 	t.Run("given a valid url, not found returns error", func(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
-		query := NewFindUrlShortenerQuery(urlId)
+		query := NewFindUrlShortenerQuery(urlId, nil)
 
 		mockRepository := storagemocks.NewUrlShortenerRepository(t)
 		mockRepository.
@@ -53,7 +53,7 @@ func TestFindApplicationService(t *testing.T) {
 	t.Run("given a valid url, return an error in the database", func(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
-		query := NewFindUrlShortenerQuery(urlId)
+		query := NewFindUrlShortenerQuery(urlId, nil)
 
 		mockRepository := storagemocks.NewUrlShortenerRepository(t)
 		mockRepository.
@@ -71,7 +71,7 @@ func TestFindApplicationService(t *testing.T) {
 	})
 	t.Run("given a valid url, return an error in the transformer", func(t *testing.T) {
 		urlId := randomvalues.RandomUrlId()
-		query := NewFindUrlShortenerQuery(urlId)
+		query := NewFindUrlShortenerQuery(urlId, nil)
 		urlExpected := domain.RandomUrlShortener(urlId, vo.Enabled)
 
 		mockRepository := storagemocks.NewUrlShortenerRepository(t)
@@ -93,7 +93,7 @@ func TestFindApplicationService(t *testing.T) {
 	})
 	t.Run("given a valid url, return data", func(t *testing.T) {
 		urlId := randomvalues.RandomUrlId()
-		query := NewFindUrlShortenerQuery(urlId)
+		query := NewFindUrlShortenerQuery(urlId, nil)
 		urlExpected := domain.RandomUrlShortener(urlId, vo.Enabled)
 		responseExpected := struct {
 			UrlId       string `json:"url_id"`
