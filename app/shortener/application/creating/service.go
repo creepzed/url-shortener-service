@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/creepzed/url-shortener-service/app/shared/application/event"
+	vo2 "github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/exception"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/repository"
@@ -29,7 +30,7 @@ func NewCreateApplicationService(repository repository.CreateAndFindRepository, 
 
 func (cas createApplicationService) Do(ctx context.Context, command CreateUrlShortenerCommand) (err error) {
 
-	urlId, err := vo.NewUrlId(command.UrlId())
+	urlId, err := vo2.NewUrlId(command.UrlId())
 	if err != nil {
 		return err
 	}

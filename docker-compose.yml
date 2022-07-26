@@ -26,6 +26,13 @@ services:
     ports:
       - '22181:2181'
 
+  zookeeper_kgs:
+    image: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - '2181:2181'
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
@@ -66,6 +73,16 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
 
+  zoonavigator:
+    image: elkozmon/zoonavigator:latest
+    restart: always
+    ports:
+      - '9000:9000'
+    environment:
+      HTTP_PORT: 9000
+
+
 volumes:
   cache:
   mongodb:
+  zkdata:

@@ -2,12 +2,13 @@ package domain
 
 import (
 	eventBase "github.com/creepzed/url-shortener-service/app/shared/application/event"
+	vo2 "github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/event"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo"
 )
 
 type UrlShortener struct {
-	urlId       vo.UrlId
+	urlId       vo2.UrlId
 	urlEnabled  vo.UrlEnabled
 	originalUrl vo.OriginalUrl
 	userId      vo.UserId
@@ -15,7 +16,7 @@ type UrlShortener struct {
 	events []eventBase.Event
 }
 
-func NewUrlShortener(urlId vo.UrlId, originalUrl vo.OriginalUrl, userId vo.UserId) (urlShortener UrlShortener) {
+func NewUrlShortener(urlId vo2.UrlId, originalUrl vo.OriginalUrl, userId vo.UserId) (urlShortener UrlShortener) {
 
 	urlShortener = UrlShortener{
 		urlId:       urlId,
@@ -34,7 +35,7 @@ func NewUrlShortener(urlId vo.UrlId, originalUrl vo.OriginalUrl, userId vo.UserI
 	return
 }
 
-func LoadUrlShortener(urlId vo.UrlId, urlEnabled vo.UrlEnabled, originalUrl vo.OriginalUrl, userId vo.UserId) UrlShortener {
+func LoadUrlShortener(urlId vo2.UrlId, urlEnabled vo.UrlEnabled, originalUrl vo.OriginalUrl, userId vo.UserId) UrlShortener {
 	urlShortener := UrlShortener{
 		urlId:       urlId,
 		urlEnabled:  urlEnabled,
@@ -44,7 +45,7 @@ func LoadUrlShortener(urlId vo.UrlId, urlEnabled vo.UrlEnabled, originalUrl vo.O
 	return urlShortener
 }
 
-func (s UrlShortener) UrlId() vo.UrlId {
+func (s UrlShortener) UrlId() vo2.UrlId {
 	return s.urlId
 }
 

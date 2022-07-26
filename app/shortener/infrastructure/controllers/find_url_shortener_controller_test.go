@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"github.com/creepzed/url-shortener-service/app/key-generation-service/application/mocks/servicemocks"
 	inmemoryBus "github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/inmemory"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/utils"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/finding"
@@ -54,7 +55,9 @@ func TestFindUrlShortener(t *testing.T) {
 		findQueryHandler := finding.NewFindUrlShortenerQueryHandler(findService)
 		queryBusInMemory.Register(finding.FindUrlShortenerQueryType, findQueryHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Find(ctx)
 
 		res := rec.Result()
@@ -100,7 +103,9 @@ func TestFindUrlShortener(t *testing.T) {
 		findQueryHandler := finding.NewFindUrlShortenerQueryHandler(findService)
 		queryBusInMemory.Register(finding.FindUrlShortenerQueryType, findQueryHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Find(ctx)
 
 		res := rec.Result()
@@ -139,7 +144,9 @@ func TestFindUrlShortener(t *testing.T) {
 		findQueryHandler := finding.NewFindUrlShortenerQueryHandler(findService)
 		queryBusInMemory.Register(finding.FindUrlShortenerQueryType, findQueryHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Find(ctx)
 
 		res := rec.Result()
@@ -178,7 +185,9 @@ func TestFindUrlShortener(t *testing.T) {
 		findQueryHandler := finding.NewFindUrlShortenerQueryHandler(findService)
 		queryBusInMemory.Register(finding.FindUrlShortenerQueryType, findQueryHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Find(ctx)
 
 		res := rec.Result()

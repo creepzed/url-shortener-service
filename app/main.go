@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"github.com/creepzed/url-shortener-service/app/key-generation-service/application/generating"
+	"github.com/creepzed/url-shortener-service/app/key-generation-service/infrastructure/zookeeper"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/inmemory"
+	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/log"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/rest"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage/mongodb"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage/redisdb"
@@ -48,35 +51,56 @@ var (
 
 	statisticsTopic = os.Getenv("KAFKA_STATISTICS_TOPIC")
 	shortenerEvent  = os.Getenv("KAFKA_SHORTENER_EVENT_TOPIC")
+
+	zookeeperPathFolder = os.Getenv("ZOOKEEPER_PATH_FOLDER")
+	zookeeperServers    = strings.Split(os.Getenv("ZOOKEEPER_SERVERS"), ",")
 )
 
 func main() {
 	server := rest.New()
 
+	//mongodb repository
 	mongodbConn := mongodb.NewMongoDBConnection(mongoDBURI, mongoDBName, mongoDBCollection)
 	repositoryMongo := mongo.NewUrlShortenerRepositoryMongo(mongodbConn, dbTimeOut)
 
+	//redis repository
 	redisConn := redisdb.NewRedisDBConnection(redisAddr, redisPassword, redisDB)
-	repositoryRedisCache := redisdb.NewRepositoryRedis(redisConn, dbTimeOut)
-
 	repositoryRedis := redis.NewUrlShortenerRepositoryRedis(redisConn, dbTimeOut)
 
+	//manager cache
+	repositoryRedisCache := redisdb.NewRepositoryRedis(redisConn, dbTimeOut)
 	repositoryCache := cache.NewCache(repositoryMongo, repositoryRedis)
 
+	//zookeeper
+	repositoryZookeeper := zookeeper.NewZookeeperRepository(zookeeperPathFolder, zookeeperServers...)
+
+	//kafka producer
 	producerQueue := producer.NewKafkaPublisher(common.GetDialer(kafkaUsername, kafkaPassword), kafkaBrokers...)
 
+	//command bus inmemory
 	commandBusInMemory := inmemory.NewCommandBusMemory()
+
+	//query bus inmemory
 	queryBusInMemory := inmemory.NewQueryBusMemory()
+
+	//event bus kafka
 	eventBusInMemory := eventbus.NewEventBusKafka(producerQueue, shortenerEvent)
 
-	createService := creating.NewCreateApplicationService(repositoryMongo, eventBusInMemory)
-
-	createCommandHandler := creating.NewCreateUrlShortenerCommandHandler(createService)
-
-	commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
-
+	//transform data
 	transform := transformer.NewTransformer()
 
+	//key generator service
+	keyGeneratorService, err := generating.NewKeyGenerateService(repositoryZookeeper)
+	if err != nil {
+		log.WithError(err).Fatal("the KGS is required to initialize the service")
+	}
+
+	//create service
+	createService := creating.NewCreateApplicationService(repositoryMongo, eventBusInMemory)
+	createCommandHandler := creating.NewCreateUrlShortenerCommandHandler(createService)
+	commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
+
+	//find service and report service
 	findService := finding.NewFindApplicationService(repositoryCache, transform)
 
 	reportWrapService := reporting.NewReportApplicationService(findService, producerQueue, statisticsTopic)
@@ -89,17 +113,19 @@ func main() {
 
 	queryBusInMemory.Register(finding.FindUrlShortenerQueryType, findQueryHandler)
 
+	//update service
 	updateService := updating.NewUpdateApplicationService(repositoryMongo, eventBusInMemory)
 	updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
 	commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
 
-	controllers.NewUrlShortenerController(server, commandBusInMemory, queryBusInMemory)
-
+	// projection redis
 	subscriberCache := subscriber.NewSubscriberUpdateCache(repositoryRedisCache, kafkaGroupId, shortenerEvent, common.GetDialer(kafkaUsername, kafkaPassword), kafkaBrokers...)
 	ctxSubscriberCache, cancelSubscriber := context.WithCancel(context.Background())
 	defer cancelSubscriber()
 	go subscriberCache.ReadMessage(ctxSubscriberCache)
 
+	// server
+	controllers.NewUrlShortenerController(server, commandBusInMemory, queryBusInMemory, keyGeneratorService)
 	go func() {
 		if err := server.StartServer(rest.Setup(host, port)); err != http.ErrServerClosed {
 			server.Logger.Fatal("shutting down the server")

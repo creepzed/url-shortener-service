@@ -2,10 +2,10 @@ package cache
 
 import (
 	"context"
+	"github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/log"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/repository"
-	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo"
 )
 
 type repositoryCached struct {

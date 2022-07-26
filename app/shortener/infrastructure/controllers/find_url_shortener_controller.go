@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"errors"
+	"github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/finding"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/exception"
-	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )

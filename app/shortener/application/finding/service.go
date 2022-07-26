@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/creepzed/url-shortener-service/app/shared/application/query"
+	"github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/exception"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/repository"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/transformer"
-	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo"
 )
 
 type FindApplicationService interface {
