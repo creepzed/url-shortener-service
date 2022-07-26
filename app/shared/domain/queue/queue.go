@@ -12,12 +12,12 @@ type MessageData interface {
 	Payload() []byte
 }
 
-type messageBase struct {
+type MessageBase struct {
 	key     []byte
 	payload []byte
 }
 
-func NewMessageData(key string, payload interface{}) (*messageBase, error) {
+func NewMessageData(key string, payload interface{}) (*MessageBase, error) {
 
 	if len(key) == 0 {
 		return nil, errors.New("error key is empty")
@@ -27,18 +27,18 @@ func NewMessageData(key string, payload interface{}) (*messageBase, error) {
 	if errConvertPayload != nil {
 		return nil, fmt.Errorf("data marshaling error: %s", errConvertPayload.Error())
 	}
-	event := &messageBase{
+	event := &MessageBase{
 		key:     []byte(key),
 		payload: payloadString,
 	}
 	return event, nil
 }
 
-func (e *messageBase) Key() []byte {
+func (e *MessageBase) Key() []byte {
 	return e.key
 }
 
-func (e *messageBase) Payload() []byte {
+func (e *MessageBase) Payload() []byte {
 	return e.payload
 }
 
@@ -46,4 +46,5 @@ type PublisherQueue interface {
 	Publish(ctx context.Context, topic string, messageData MessageData) error
 	Close(topic string) error
 }
+
 //go:generate mockery --case=snake --outpkg=queuemocks --output=../mocks/queuemocksmocks --name=PublisherQueue
