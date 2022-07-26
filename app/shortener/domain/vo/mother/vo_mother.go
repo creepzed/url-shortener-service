@@ -1,11 +1,12 @@
 package mother
 
 import (
+	vo2 "github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo"
 )
 
-func UrlId(urlId string) vo.UrlId {
-	vo, _ := vo.NewUrlId(urlId)
+func UrlId(urlId string) vo2.UrlId {
+	vo, _ := vo2.NewUrlId(urlId)
 	return vo
 }
 

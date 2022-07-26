@@ -11,6 +11,7 @@ require (
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.20.0 // indirect
+	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 	github.com/segmentio/kafka-go v0.4.32
 	github.com/stretchr/testify v1.8.0
 	go.mongodb.org/mongo-driver v1.10.0

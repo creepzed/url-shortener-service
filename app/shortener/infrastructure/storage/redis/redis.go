@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	vo2 "github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage/redisdb"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/utils"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
@@ -45,7 +46,7 @@ func (r *urlShortenerRepositoryRedis) Create(ctx context.Context, urlShortener d
 	return nil
 }
 
-func (r *urlShortenerRepositoryRedis) FindById(ctx context.Context, urlId vo.UrlId) (domain.UrlShortener, error) {
+func (r *urlShortenerRepositoryRedis) FindById(ctx context.Context, urlId vo2.UrlId) (domain.UrlShortener, error) {
 	result, err := r.baseRepository.Get(ctx, urlId.Value())
 	if err != nil {
 		return domain.UrlShortener{}, err
@@ -56,7 +57,7 @@ func (r *urlShortenerRepositoryRedis) FindById(ctx context.Context, urlId vo.Url
 	if err != nil {
 		return domain.UrlShortener{}, err
 	}
-	anUrlId, err := vo.NewUrlId(doc.UrlId)
+	anUrlId, err := vo2.NewUrlId(doc.UrlId)
 	if err != nil {
 		return domain.UrlShortener{}, err
 	}

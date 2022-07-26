@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"github.com/creepzed/url-shortener-service/app/key-generation-service/application/mocks/servicemocks"
 	inmemoryBus "github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/inmemory"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/updating"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
@@ -58,7 +59,9 @@ func TestUpdateUrlShortener(t *testing.T) {
 		updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
 		commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Update(ctx)
 		require.NoError(t, err)
 
@@ -97,7 +100,9 @@ func TestUpdateUrlShortener(t *testing.T) {
 		updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
 		commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Update(ctx)
 
 		res := rec.Result()
@@ -139,7 +144,9 @@ func TestUpdateUrlShortener(t *testing.T) {
 		updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
 		commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Update(ctx)
 
 		res := rec.Result()
@@ -182,7 +189,9 @@ func TestUpdateUrlShortener(t *testing.T) {
 		updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
 		commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Update(ctx)
 
 		res := rec.Result()
@@ -221,7 +230,9 @@ func TestUpdateUrlShortener(t *testing.T) {
 		updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
 		commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Update(ctx)
 
 		res := rec.Result()
@@ -259,7 +270,9 @@ func TestUpdateUrlShortener(t *testing.T) {
 		updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
 		commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Update(ctx)
 
 		res := rec.Result()
@@ -298,7 +311,9 @@ func TestUpdateUrlShortener(t *testing.T) {
 		updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
 		commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Update(ctx)
 
 		res := rec.Result()

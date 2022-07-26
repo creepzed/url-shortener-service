@@ -3,8 +3,8 @@ package inmemory
 import (
 	"context"
 	"errors"
+	"github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
-	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo"
 )
 
 type urlShortenerRepositoryInMemory struct {

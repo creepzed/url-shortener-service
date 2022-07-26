@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"fmt"
+	vo2 "github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage/mongodb"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/utils"
@@ -52,7 +53,7 @@ func (u *urlShortenerRepositoryMongoDB) Create(ctx context.Context, urlShortener
 	return nil
 }
 
-func (u *urlShortenerRepositoryMongoDB) FindById(ctx context.Context, urlId vo.UrlId) (domain.UrlShortener, error) {
+func (u *urlShortenerRepositoryMongoDB) FindById(ctx context.Context, urlId vo2.UrlId) (domain.UrlShortener, error) {
 	filter := map[string]interface{}{
 		"url_id": urlId.Value(),
 	}
@@ -68,7 +69,7 @@ func (u *urlShortenerRepositoryMongoDB) FindById(ctx context.Context, urlId vo.U
 		return domain.UrlShortener{}, err
 	}
 
-	anUrlId, err := vo.NewUrlId(doc.UrlId)
+	anUrlId, err := vo2.NewUrlId(doc.UrlId)
 	if err != nil {
 		return domain.UrlShortener{}, err
 	}

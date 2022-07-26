@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/creepzed/url-shortener-service/app/shared/application/event"
+	vo2 "github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/exception"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/repository"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo"
@@ -26,7 +27,7 @@ func NewUpdateApplicationService(repository repository.UpdateAndFindRepository, 
 }
 
 func (uas updateApplicationService) Do(ctx context.Context, command UpdateUrlShortenerCommand) (err error) {
-	urlId, err := vo.NewUrlId(command.UrlId())
+	urlId, err := vo2.NewUrlId(command.UrlId())
 	if err != nil {
 		return err
 	}

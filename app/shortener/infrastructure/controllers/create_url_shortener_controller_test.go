@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"github.com/creepzed/url-shortener-service/app/key-generation-service/application/mocks/servicemocks"
 	inmemoryBus "github.com/creepzed/url-shortener-service/app/shared/infrastructure/bus/inmemory"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/creating"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
@@ -52,7 +53,12 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+		serviceKGSMock.
+			On("GetKey").
+			Return(randomvalues.RandomUrlId(), nil)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -85,7 +91,9 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -117,7 +125,9 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -148,7 +158,9 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -192,7 +204,12 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+		serviceKGSMock.
+			On("GetKey").
+			Return(randomvalues.RandomUrlId(), nil)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -230,7 +247,12 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+		serviceKGSMock.
+			On("GetKey").
+			Return(randomvalues.RandomUrlId(), nil)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()
@@ -271,7 +293,12 @@ func TestCreateUrlShortenerController(t *testing.T) {
 
 		commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
-		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory)
+		serviceKGSMock := servicemocks.NewKeyGenerateService(t)
+		serviceKGSMock.
+			On("GetKey").
+			Return(randomvalues.RandomUrlId(), nil)
+
+		urlShortenerController := NewUrlShortenerController(e, commandBusInMemory, queryBusInMemory, serviceKGSMock)
 		err := urlShortenerController.Create(ctx)
 
 		res := rec.Result()

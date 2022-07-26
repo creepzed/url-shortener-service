@@ -2,15 +2,9 @@ package repository
 
 import (
 	"context"
+	"github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain"
-	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo"
 )
-
-type KeyGenerateService interface {
-	GetKey() (vo.UrlId, error)
-}
-
-//go:generate mockery --case=snake --outpkg=storagemocks --output=../mocks/storagemocks --name=KeyGenerateService
 
 type UrlShortenerRepository interface {
 	CreateUrlShortenerRepository
