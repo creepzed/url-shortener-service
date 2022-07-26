@@ -11,11 +11,13 @@ func TestFindUrlShortenerQuery(t *testing.T) {
 	t.Run("given a valid request, the query is built", func(t *testing.T) {
 		urlId := randomvalues.RandomUrlId()
 
-		commandType := FindUrlShortenerQueryType
+		queryType := FindUrlShortenerQueryType
 
-		qry := NewFindUrlShortenerQuery(urlId, nil)
+		metadata := Metadata{}
+		qry := NewFindUrlShortenerQuery(urlId, metadata)
 
-		assert.Equal(t, qry.Type(), commandType)
+		assert.Equal(t, qry.Type(), queryType)
 		assert.Equal(t, qry.UrlId(), urlId)
+		assert.Equal(t, qry.Metadata(), metadata)
 	})
 }

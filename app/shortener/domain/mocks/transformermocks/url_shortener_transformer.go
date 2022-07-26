@@ -37,6 +37,29 @@ func (_m *UrlShortenerTransformer) Transform(shortener domain.UrlShortener) (int
 	return r0, r1
 }
 
+// TransformList provides a mock function with given fields: shortenerList
+func (_m *UrlShortenerTransformer) TransformList(shortenerList []domain.UrlShortener) ([]interface{}, error) {
+	ret := _m.Called(shortenerList)
+
+	var r0 []interface{}
+	if rf, ok := ret.Get(0).(func([]domain.UrlShortener) []interface{}); ok {
+		r0 = rf(shortenerList)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]interface{})
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func([]domain.UrlShortener) error); ok {
+		r1 = rf(shortenerList)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewUrlShortenerTransformer creates a new instance of UrlShortenerTransformer. It also registers the testing.TB interface on the mock and a cleanup function to assert the mocks expectations.
 func NewUrlShortenerTransformer(t testing.TB) *UrlShortenerTransformer {
 	mock := &UrlShortenerTransformer{}

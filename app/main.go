@@ -11,6 +11,7 @@ import (
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage/redisdb"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/creating"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/finding"
+	"github.com/creepzed/url-shortener-service/app/shortener/application/getting"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/reporting"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/updating"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers"
@@ -115,6 +116,11 @@ func main() {
 	findQueryHandler := finding.NewFindUrlShortenerQueryHandler(reportWrapService)
 
 	queryBusInMemory.Register(finding.FindUrlShortenerQueryType, findQueryHandler)
+
+	//get all by userId service
+	getAllService := getting.NewGetAllApplicationService(repositoryMongo, transform)
+	getAllQueryHandler := getting.NewGetAllUrlShortenerQueryHandler(getAllService)
+	queryBusInMemory.Register(getting.GetAllUrlShortenerQueryType, getAllQueryHandler)
 
 	//update service
 	updateService := updating.NewUpdateApplicationService(repositoryMongo, eventBusKafka)

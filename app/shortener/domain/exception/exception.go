@@ -3,9 +3,9 @@ package exception
 import "errors"
 
 var (
-	ErrUrlIdDuplicate = errors.New("error UrlId duplicate")
-	ErrEmptyUrlId     = errors.New("the field UrlId can not be empty")
-	ErrInvalidUrlId   = errors.New("the field UrlId is invalid")
+	ErrUrlIdDuplicate = errors.New("error UserId duplicate")
+	ErrEmptyUrlId     = errors.New("the field UserId can not be empty")
+	ErrInvalidUrlId   = errors.New("the field UserId is invalid")
 
 	ErrInvalidUserId = errors.New("the field UserId is invalid")
 

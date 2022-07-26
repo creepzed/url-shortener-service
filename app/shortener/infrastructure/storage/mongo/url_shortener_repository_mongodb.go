@@ -3,7 +3,7 @@ package mongo
 import (
 	"context"
 	"fmt"
-	vo2 "github.com/creepzed/url-shortener-service/app/shared/domain/vo"
+	urlVo "github.com/creepzed/url-shortener-service/app/shared/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/storage/mongodb"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/utils"
@@ -53,7 +53,7 @@ func (u *urlShortenerRepositoryMongoDB) Create(ctx context.Context, urlShortener
 	return nil
 }
 
-func (u *urlShortenerRepositoryMongoDB) FindById(ctx context.Context, urlId vo2.UrlId) (domain.UrlShortener, error) {
+func (u *urlShortenerRepositoryMongoDB) FindById(ctx context.Context, urlId urlVo.UrlId) (domain.UrlShortener, error) {
 	filter := map[string]interface{}{
 		"url_id": urlId.Value(),
 	}
@@ -69,7 +69,56 @@ func (u *urlShortenerRepositoryMongoDB) FindById(ctx context.Context, urlId vo2.
 		return domain.UrlShortener{}, err
 	}
 
-	anUrlId, err := vo2.NewUrlId(doc.UrlId)
+	anUrlShortener, err := u.loadAnUrl(doc)
+	if err != nil {
+		return domain.UrlShortener{}, err
+	}
+	return anUrlShortener, nil
+}
+
+func (u *urlShortenerRepositoryMongoDB) Update(ctx context.Context, urlShortener domain.UrlShortener) error {
+	filter := map[string]interface{}{
+		"url_id": urlShortener.UrlId().Value(),
+	}
+	doc := NewUrlShortenerMongo(urlShortener)
+	err := u.baseRepository.Update(ctx, filter, doc)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *urlShortenerRepositoryMongoDB) GetAllByUserId(ctx context.Context, userId vo.UserId) ([]domain.UrlShortener, error) {
+	filter := map[string]interface{}{
+		"user_id": userId.Value(),
+	}
+
+	result, err := u.baseRepository.Find(ctx, filter)
+	if err != nil {
+		return []domain.UrlShortener{}, err
+	}
+
+	docs := make([]UrlShortenerMongoDB, 0)
+	err = utils.ConvertEntity(result, &docs)
+	if err != nil {
+		return []domain.UrlShortener{}, err
+	}
+
+	listUrlShortener := make([]domain.UrlShortener, 0)
+	for _, doc := range docs {
+		anUrlShortener, err := u.loadAnUrl(&doc)
+		if err != nil {
+			return []domain.UrlShortener{}, err
+		}
+		listUrlShortener = append(listUrlShortener, anUrlShortener)
+	}
+
+	return listUrlShortener, nil
+}
+
+func (u urlShortenerRepositoryMongoDB) loadAnUrl(doc *UrlShortenerMongoDB) (domain.UrlShortener, error) {
+	anUrlId, err := urlVo.NewUrlId(doc.UrlId)
 	if err != nil {
 		return domain.UrlShortener{}, err
 	}
@@ -88,17 +137,4 @@ func (u *urlShortenerRepositoryMongoDB) FindById(ctx context.Context, urlId vo2.
 
 	anUrlShortener := domain.LoadUrlShortener(anUrlId, anUrlEnable, anOriginalUrl, anUserId)
 	return anUrlShortener, nil
-}
-
-func (u *urlShortenerRepositoryMongoDB) Update(ctx context.Context, urlShortener domain.UrlShortener) error {
-	filter := map[string]interface{}{
-		"url_id": urlShortener.UrlId().Value(),
-	}
-	doc := NewUrlShortenerMongo(urlShortener)
-	err := u.baseRepository.Update(ctx, filter, doc)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

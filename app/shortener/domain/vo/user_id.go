@@ -19,13 +19,21 @@ func NewUserId(value string) (userId UserId, err error) {
 }
 
 func (u *UserId) hasError() error {
-	_, err := mail.ParseAddress(u.value)
+	err := IsValidUserId(u.value)
 	if err != nil {
-		return fmt.Errorf("%w: %s", exception.ErrInvalidUserId, u.Value())
+		return err
 	}
 	return nil
 }
 
 func (u UserId) Value() string {
 	return u.value
+}
+
+func IsValidUserId(userId string) error {
+	_, err := mail.ParseAddress(userId)
+	if err != nil {
+		return fmt.Errorf("%w: %s", exception.ErrInvalidUserId, userId)
+	}
+	return nil
 }

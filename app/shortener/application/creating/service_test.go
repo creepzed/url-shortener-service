@@ -17,7 +17,7 @@ import (
 func TestCreateApplicationService(t *testing.T) {
 	t.Parallel()
 
-	t.Run("Receiving a create URL shortener command, but the UrlId is not valid", func(t *testing.T) {
+	t.Run("Receiving a create URL shortener command, but the UserId is not valid", func(t *testing.T) {
 		command := NewCreateUrlShortenerCommand(randomvalues.InvalidUrlId(), randomvalues.RandomOriginalUrl(), randomvalues.RandomUserId())
 
 		mockRepository := storagemocks.NewUrlShortenerRepository(t)
@@ -89,7 +89,7 @@ func TestCreateApplicationService(t *testing.T) {
 		assert.Nil(t, err)
 	})
 
-	t.Run("When receiving a valid create url shortener, but UrlId is duplicate", func(t *testing.T) {
+	t.Run("When receiving a valid create url shortener, but UserId is duplicate", func(t *testing.T) {
 
 		urlId := randomvalues.RandomUrlId()
 		originalUrl := randomvalues.RandomOriginalUrl()
@@ -141,7 +141,7 @@ func TestCreateApplicationService(t *testing.T) {
 		command := NewCreateUrlShortenerCommand(randomvalues.RandomUrlId(), randomvalues.RandomOriginalUrl(), randomvalues.RandomUserId())
 
 		mockRepository := storagemocks.NewUrlShortenerRepository(t)
-	
+
 		mockRepository.
 			On("FindById", context.Background(), mock.AnythingOfType("vo.UrlId")).
 			Return(domain.UrlShortener{}, exception.ErrDataBase)

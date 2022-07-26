@@ -14,7 +14,7 @@ import (
 	"testing"
 )
 
-func TestFindApplicationService(t *testing.T) {
+func TestGelAllApplicationService(t *testing.T) {
 	t.Parallel()
 	t.Run("given an invalid url, it should return the invalid url error", func(t *testing.T) {
 
