@@ -23,3 +23,15 @@ func (t transformer) Transform(urlShortener domain.UrlShortener) (interface{}, e
 
 	return anUrlShortener, nil
 }
+
+func (t transformer) TransformList(shortenerList []domain.UrlShortener) ([]interface{}, error) {
+	result := make([]interface{}, 0)
+	for _, urlShortener := range shortenerList {
+		short, err := t.Transform(urlShortener)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, short)
+	}
+	return result, nil
+}

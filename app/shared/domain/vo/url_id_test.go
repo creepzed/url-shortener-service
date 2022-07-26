@@ -10,7 +10,7 @@ import (
 
 func TestUrlId(t *testing.T) {
 	t.Parallel()
-	t.Run("give a valid value a UrlId is created", func(t *testing.T) {
+	t.Run("give a valid value a UserId is created", func(t *testing.T) {
 		value := randomvalues.RandomUrlId()
 
 		vo, err := NewUrlId(value)
@@ -18,7 +18,7 @@ func TestUrlId(t *testing.T) {
 		assert.Equal(t, vo.Value(), value)
 	})
 
-	t.Run("give a valid value a UrlId is not created", func(t *testing.T) {
+	t.Run("give a valid value a UserId is not created", func(t *testing.T) {
 		value := randomvalues.InvalidUrlId()
 
 		_, err := NewUrlId(value)
@@ -26,7 +26,7 @@ func TestUrlId(t *testing.T) {
 		assert.ErrorIs(t, err, exception.ErrInvalidUrlId)
 	})
 
-	t.Run("given an empty value does not create a UrlId", func(t *testing.T) {
+	t.Run("given an empty value does not create a UserId", func(t *testing.T) {
 		value := ""
 
 		_, err := NewUrlId(value)

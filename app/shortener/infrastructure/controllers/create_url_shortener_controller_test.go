@@ -171,7 +171,7 @@ func TestCreateUrlShortenerController(t *testing.T) {
 			assert.ErrorIs(t, err, ErrInvalidRequestBody)
 		}
 	})
-	t.Run("given the duplicate UrlId returns 409", func(t *testing.T) {
+	t.Run("given the duplicate UserId returns 409", func(t *testing.T) {
 		target := "/api/v1/shortener"
 
 		urlId := randomvalues.RandomUrlId()

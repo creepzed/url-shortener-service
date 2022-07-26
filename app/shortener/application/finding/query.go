@@ -21,7 +21,7 @@ func (f FindUrlShortenerQuery) UrlId() string {
 	return f.urlId
 }
 
-func (f FindUrlShortenerQuery) Metadata() map[string]interface{} {
+func (f FindUrlShortenerQuery) Metadata() Metadata {
 	return f.metadata
 }
 

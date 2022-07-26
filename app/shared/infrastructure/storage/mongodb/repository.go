@@ -119,3 +119,29 @@ func (r *repositoryMongoDB) errorHandler(err error) error {
 	}
 	return auxErr
 }
+
+func (r *repositoryMongoDB) Find(ctx context.Context, filter map[string]interface{}) (listAggregate []map[string]interface{}, err error) {
+	ctxConnectionTimeout, connectionCancel := context.WithTimeout(ctx, r.dbTimeout)
+	defer connectionCancel()
+
+	collection, err := r.connection.GetCollection(ctxConnectionTimeout)
+	defer r.connection.Close(ctx)
+
+	if err != nil {
+		return []map[string]interface{}{}, r.errorHandler(err)
+	}
+
+	ctxTimeout, findByIdOneCancel := context.WithTimeout(ctx, r.dbTimeout)
+	defer findByIdOneCancel()
+
+	cursor, err := collection.Find(ctxTimeout, filter)
+	if err != nil {
+		return []map[string]interface{}{}, r.errorHandler(err)
+	}
+
+	var docs []map[string]interface{}
+	if err = cursor.All(ctx, &docs); err != nil {
+		return []map[string]interface{}{}, err
+	}
+	return docs, nil
+}

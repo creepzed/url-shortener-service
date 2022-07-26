@@ -123,6 +123,48 @@ func TestUpdateApplicationService(t *testing.T) {
 		assert.ErrorIs(t, err, exception.ErrEventBus)
 	})
 
+	t.Run("given a valid url, when invalid the original url returns an error", func(t *testing.T) {
+		urlId := randomvalues.RandomUrlId()
+		urlExpected := domain.RandomUrlShortener(urlId, vo.Enabled)
+		auxIsEnabled := vo.Disabled
+		cmd := NewUpdateUrlShortenerCommand(urlExpected.UrlId().Value(),
+			&auxIsEnabled, randomvalues.InvalidOriginalUrl(), urlExpected.UserId().Value())
+
+		mockRepository := storagemocks.NewUrlShortenerRepository(t)
+		mockRepository.
+			On("FindById", context.Background(), mock.AnythingOfType("vo.UrlId")).
+			Return(urlExpected, nil)
+
+		mockEventBus := eventmocks.NewEventBus(t)
+
+		service := NewUpdateApplicationService(mockRepository, mockEventBus)
+		err := service.Do(context.Background(), cmd)
+
+		require.Error(t, err)
+		assert.ErrorIs(t, err, exception.ErrInvalidOriginalUrl)
+	})
+
+	t.Run("given a valid url, when invalid the userid returns an error", func(t *testing.T) {
+		urlId := randomvalues.RandomUrlId()
+		urlExpected := domain.RandomUrlShortener(urlId, vo.Enabled)
+		auxIsEnabled := vo.Disabled
+		cmd := NewUpdateUrlShortenerCommand(urlExpected.UrlId().Value(),
+			&auxIsEnabled, urlExpected.OriginalUrl().Value(), randomvalues.InvalidUrlId())
+
+		mockRepository := storagemocks.NewUrlShortenerRepository(t)
+		mockRepository.
+			On("FindById", context.Background(), mock.AnythingOfType("vo.UrlId")).
+			Return(urlExpected, nil)
+
+		mockEventBus := eventmocks.NewEventBus(t)
+
+		service := NewUpdateApplicationService(mockRepository, mockEventBus)
+		err := service.Do(context.Background(), cmd)
+
+		require.Error(t, err)
+		assert.ErrorIs(t, err, exception.ErrInvalidUserId)
+	})
+
 	t.Run("given a valid url, return ok", func(t *testing.T) {
 		urlId := randomvalues.RandomUrlId()
 		urlExpected := domain.RandomUrlShortener(urlId, vo.Enabled)
