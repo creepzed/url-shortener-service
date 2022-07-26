@@ -84,7 +84,10 @@ func main() {
 	queryBusInMemory := inmemory.NewQueryBusMemory()
 
 	//event bus kafka
-	eventBusInMemory := eventbus.NewEventBusKafka(producerQueue, shortenerEvent)
+	eventBusKafka := eventbus.NewEventBusKafka(producerQueue, shortenerEvent)
+	ctxEventBusObserver, cancelEventBusObserver := context.WithCancel(context.Background())
+	defer cancelEventBusObserver()
+	go eventBusKafka.Observer(ctxEventBusObserver)
 
 	//transform data
 	transform := transformer.NewTransformer()
@@ -96,7 +99,7 @@ func main() {
 	}
 
 	//create service
-	createService := creating.NewCreateApplicationService(repositoryMongo, eventBusInMemory)
+	createService := creating.NewCreateApplicationService(repositoryMongo, eventBusKafka)
 	createCommandHandler := creating.NewCreateUrlShortenerCommandHandler(createService)
 	commandBusInMemory.Register(creating.CreateUrlShortenerCommandType, createCommandHandler)
 
@@ -105,16 +108,16 @@ func main() {
 
 	reportWrapService := reporting.NewReportApplicationService(findService, producerQueue, statisticsTopic)
 
-	ctxObserver, cancelObserver := context.WithCancel(context.Background())
-	defer cancelObserver()
-	go reportWrapService.Observer(ctxObserver)
+	ctxReportObserver, cancelReportObserver := context.WithCancel(context.Background())
+	defer cancelReportObserver()
+	go reportWrapService.Observer(ctxReportObserver)
 
 	findQueryHandler := finding.NewFindUrlShortenerQueryHandler(reportWrapService)
 
 	queryBusInMemory.Register(finding.FindUrlShortenerQueryType, findQueryHandler)
 
 	//update service
-	updateService := updating.NewUpdateApplicationService(repositoryMongo, eventBusInMemory)
+	updateService := updating.NewUpdateApplicationService(repositoryMongo, eventBusKafka)
 	updateCommandHandler := updating.NewUpdateUrlShortenerCommandHandler(updateService)
 	commandBusInMemory.Register(updating.UpdateUrlShortenerCommandType, updateCommandHandler)
 
