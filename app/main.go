@@ -31,7 +31,6 @@ import (
 )
 
 const (
-	host      = ""
 	dbTimeOut = 5 * time.Second
 )
 
@@ -101,7 +100,6 @@ func main() {
 		log.WithError(err).Fatal("the KGS is required to initialize the service")
 	}
 
-	log.Debug("Infrastructure - OK")
 	//create service
 	createService := creating.NewCreateApplicationService(repositoryMongo, eventBusKafka)
 	createCommandHandler := creating.NewCreateUrlShortenerCommandHandler(createService)
@@ -151,7 +149,6 @@ func main() {
 	ctxServer, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctxServer); err != nil {
-		log.Debug("Error Fatal Server...")
 		server.Logger.Fatal(err)
 	}
 

@@ -28,7 +28,7 @@ func (r *repositoryCached) FindById(ctx context.Context, urlId vo.UrlId) (domain
 		if err == nil {
 			errCache := r.cache.Create(ctx, resultDB)
 			if errCache != nil {
-				log.WithError(err).Error("error saving in cache")
+				log.Error("error saving in cache")
 			}
 		}
 		return resultDB, err
