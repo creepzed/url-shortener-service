@@ -33,9 +33,9 @@ func NewUrlShortenerController(e *echo.Echo, commandBus command.CommandBus, quer
 			subGroup.GET("/:url_id", controller.Find)
 			subGroup.PATCH("/:url_id", controller.Update)
 			subGroup.GET("/user/:usr_id", controller.GetAll)
-
 		}
 	}
+
 	return controller
 
 }
