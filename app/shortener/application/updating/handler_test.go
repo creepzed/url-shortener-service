@@ -23,7 +23,7 @@ func TestUpdateUrlShortenerCommandHandler(t *testing.T) {
 		urlExpected := domain.RandomUrlShortener(urlId, vo.Enabled)
 
 		auxIsEnabled := urlExpected.IsEnabled().Value()
-		cmd := NewUpdateUrlShortenerCommand(urlId, &auxIsEnabled, urlExpected.OriginalUrl().Value(), urlExpected.UserId().Value())
+		cmd := NewUpdateUrlShortenerCommand(urlId, &auxIsEnabled, urlExpected.OriginalUrl().Value())
 
 		mockRepository := storagemocks.NewUrlShortenerRepository(t)
 

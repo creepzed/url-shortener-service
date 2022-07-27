@@ -11,6 +11,19 @@ import (
 	"net/http"
 )
 
+// Update godoc
+// @Summary      Update an Url Short
+// @Description  Update by json Url Short
+// @Tags         shortener
+// @Accept       json
+// @Produce      json
+// @Param        url_Id          path      string                true  "Url Id"
+// @Param        shortener       body      request.UpdateRequest true  "Update Url Short"
+// @Failure      400             {object}  map[string]interface{}
+// @Failure      404             {object}  map[string]interface{}
+// @Failure      500             {object}  map[string]interface{}
+// @Router    	 /api/v1/shortener/{url_id}  [patch]
+
 func (ctrl *urlShortenerController) Update(c echo.Context) (err error) {
 	urlId := c.Param("url_id")
 
@@ -31,12 +44,12 @@ func (ctrl *urlShortenerController) Update(c echo.Context) (err error) {
 		return fmt.Errorf("%w: %s", ErrInvalidRequestBody, err.Error())
 	}
 
-	if request.IsEnabled == nil && request.OriginalUrl == "" && request.UserId == "" {
+	if request.IsEnabled == nil && request.OriginalUrl == "" {
 		c.JSON(http.StatusBadRequest, echo.Map{"message": "request body cannot be empty"})
 		return ErrInvalidRequestBody
 	}
 
-	cmd := updating.NewUpdateUrlShortenerCommand(urlId, request.IsEnabled, request.OriginalUrl, request.UserId)
+	cmd := updating.NewUpdateUrlShortenerCommand(urlId, request.IsEnabled, request.OriginalUrl)
 
 	err = ctrl.commandBus.Dispatch(c.Request().Context(), cmd)
 	if err != nil {

@@ -5,10 +5,10 @@ import (
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/randomvalues"
 )
 
+//UpdateRequest
 type UpdateRequest struct {
-	OriginalUrl string `json:"original_url,omitempty"`
-	IsEnabled   *bool  `json:"is_enabled,omitempty"`
-	UserId      string `json:"user_id,omitempty"`
+	OriginalUrl string `json:"original_url,omitempty"` // Original Url
+	IsEnabled   *bool  `json:"is_enabled,omitempty"`   // Enabled
 }
 
 func (r UpdateRequest) String() string {
@@ -19,7 +19,6 @@ func RandomUpdateRequest(urlId string, enabled *bool) UpdateRequest {
 	return UpdateRequest{
 		IsEnabled:   enabled,
 		OriginalUrl: randomvalues.RandomOriginalUrl(),
-		UserId:      randomvalues.RandomUserId(),
 	}
 }
 
@@ -27,13 +26,11 @@ func FailRequestUpdateWithWrongOriginalUrl(urlId string, enabled *bool) UpdateRe
 	return UpdateRequest{
 		IsEnabled:   enabled,
 		OriginalUrl: randomvalues.InvalidOriginalUrl(),
-		UserId:      randomvalues.RandomUserId(),
 	}
 }
 func FailRequestUpdateWithWrongUserId(urlId string, enabled *bool) UpdateRequest {
 	return UpdateRequest{
 		IsEnabled:   enabled,
 		OriginalUrl: randomvalues.RandomOriginalUrl(),
-		UserId:      randomvalues.InvalidUserId(),
 	}
 }

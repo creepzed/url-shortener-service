@@ -13,12 +13,11 @@ type UpdateUrlShortenerCommand struct {
 	userId      string
 }
 
-func NewUpdateUrlShortenerCommand(urlId string, isEnabled *bool, originalUrl string, userId string) UpdateUrlShortenerCommand {
+func NewUpdateUrlShortenerCommand(urlId string, isEnabled *bool, originalUrl string) UpdateUrlShortenerCommand {
 	return UpdateUrlShortenerCommand{
 		urlId:       urlId,
 		isEnabled:   isEnabled,
 		originalUrl: originalUrl,
-		userId:      userId,
 	}
 }
 

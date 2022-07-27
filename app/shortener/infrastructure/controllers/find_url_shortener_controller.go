@@ -9,6 +9,18 @@ import (
 	"net/http"
 )
 
+// Find godoc
+// @Summary      Find an Url Short
+// @Description  get string by UrlId
+// @Tags         shortener
+// @Accept       json
+// @Produce      json
+// @Param        url_id path    string  true  "Url Id"
+// @Success      200  {object}  response.OutputResponse
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Failure      500  {object}  map[string]interface{}
+// @Router       /api/v1/shortener/{url_id} [get]
 func (ctrl *urlShortenerController) Find(c echo.Context) (err error) {
 	urlId := c.Param("url_id")
 

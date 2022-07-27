@@ -12,16 +12,15 @@ func TestUpdateUrlShortenerCommand(t *testing.T) {
 		urlId := randomvalues.RandomUrlId()
 		isEnabled := randomvalues.RandomIsEnabled()
 		originalUrl := randomvalues.RandomOriginalUrl()
-		userId := randomvalues.RandomUserId()
+
 		commandType := UpdateUrlShortenerCommandType
 
-		cmd := NewUpdateUrlShortenerCommand(urlId, &isEnabled, originalUrl, userId)
+		cmd := NewUpdateUrlShortenerCommand(urlId, &isEnabled, originalUrl)
 
 		assert.Equal(t, cmd.Type(), commandType)
 		assert.Equal(t, cmd.UrlId(), urlId)
 		auxIsEnabled := cmd.IsEnabled()
 		assert.Equal(t, *auxIsEnabled, isEnabled)
 		assert.Equal(t, cmd.OriginalUrl(), originalUrl)
-		assert.Equal(t, cmd.UserId(), userId)
 	})
 }

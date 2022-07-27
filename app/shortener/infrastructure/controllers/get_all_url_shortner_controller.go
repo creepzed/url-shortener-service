@@ -10,6 +10,19 @@ import (
 	"net/http"
 )
 
+// ListUrlShort by User Id godoc
+// @Summary      List Url Shorts
+// @Description  get Url Shorts by User Id
+// @Tags         shortener
+// @Accept       json
+// @Produce      json
+// @Param        user_id path   string  true  "User Id"
+// @Success      200  {array}   response.OutputResponse
+// @Failure      400  {object}  map[string]interface{}
+// @Failure      404  {object}  map[string]interface{}
+// @Failure      500  {object}  map[string]interface{}
+// @Router      /api/v1/shortener/user/{user_id} [get]
+
 func (ctrl *urlShortenerController) GetAll(c echo.Context) (err error) {
 	userId := c.Param("usr_id")
 

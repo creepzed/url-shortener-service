@@ -6,9 +6,10 @@ import (
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/randomvalues"
 )
 
+//UrlShortenerRequestCreate
 type UrlShortenerRequestCreate struct {
-	OriginalUrl string `json:"original_url" validate:"url,required"`
-	UserId      string `json:"user_id" validate:"email,required"`
+	OriginalUrl string `json:"original_url" validate:"url,required"` // Original Url
+	UserId      string `json:"user_id" validate:"email,required"`    // User Id
 }
 
 func (r UrlShortenerRequestCreate) String() string {

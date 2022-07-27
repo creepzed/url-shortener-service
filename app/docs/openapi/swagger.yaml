@@ -1,0 +1,117 @@
+basePath: /
+definitions:
+  request.UrlShortenerRequestCreate:
+    properties:
+      original_url:
+        description: Original Url
+        type: string
+      user_id:
+        description: User Id
+        type: string
+    required:
+    - original_url
+    - user_id
+    type: object
+  response.OutputResponse:
+    properties:
+      is_enabled:
+        description: Is Enabled
+        type: boolean
+      original_url:
+        description: Original Url
+        type: string
+      url_id:
+        description: Url Id
+        type: string
+      user_id:
+        description: User Id
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: rodrigo.cuevas.morales@gmail.com
+    name: API Support
+    url: https://github.com/creepzed/url-shortener-service
+  description: This is a service.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Url Shortener Service
+  version: "0.1"
+paths:
+  /api/v1/shortener:
+    post:
+      consumes:
+      - application/json
+      description: add by json Url Short
+      parameters:
+      - description: Add Url
+        in: body
+        name: shortener
+        required: true
+        schema:
+          $ref: '#/definitions/request.UrlShortenerRequestCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.OutputResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Add an Url Short
+      tags:
+      - shortener
+  /api/v1/shortener/{url_id}:
+    get:
+      consumes:
+      - application/json
+      description: get string by UrlId
+      parameters:
+      - description: Url Id
+        in: path
+        name: url_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.OutputResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Find an Url Short
+      tags:
+      - shortener
+swagger: "2.0"

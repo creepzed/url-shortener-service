@@ -13,6 +13,18 @@ import (
 	"net/http"
 )
 
+// Create Url Short godoc
+// @Summary      Add an Url Short
+// @Description  add by json Url Short
+// @Tags         shortener
+// @Accept       json
+// @Produce      json
+// @Param        shortener body     request.UrlShortenerRequestCreate  true  "Add Url"
+// @Success      200      {object}  response.OutputResponse
+// @Failure      400      {object}  map[string]interface{}
+// @Failure      404      {object}  map[string]interface{}
+// @Failure      500      {object}  map[string]interface{}
+// @Router       /api/v1/shortener  [post]
 func (ctrl *urlShortenerController) Create(c echo.Context) (err error) {
 	request := new(request.UrlShortenerRequestCreate)
 
