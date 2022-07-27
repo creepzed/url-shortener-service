@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/log"
 	"github.com/creepzed/url-shortener-service/docs/openapi"
-	_ "github.com/creepzed/url-shortener-service/docs/openapi"
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
