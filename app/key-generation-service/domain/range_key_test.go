@@ -17,8 +17,6 @@ func TestNewRangeKey(t *testing.T) {
 
 		require.NoError(t, err)
 		require.NotEmpty(t, key)
-		assert.Equal(t, "B", key)
-
 	})
 
 	t.Run("should return an error", func(t *testing.T) {
