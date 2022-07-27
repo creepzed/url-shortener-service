@@ -2,7 +2,9 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/log"
+	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo/randomvalues"
 	"github.com/jxskiss/base62"
 	"sync"
 )
@@ -30,7 +32,8 @@ func (rk *RangeKey) GetKey() (string, error) {
 	}
 	dst := base62.FormatUint(auxOffset)
 	str := string(dst)
-	return str, nil
+	key := fmt.Sprintf("%s%s", str, rk.subString())
+	return key, nil
 }
 func (rk *RangeKey) newOffset() (uint64, error) {
 	rk.mutex.Lock()
@@ -43,4 +46,12 @@ func (rk *RangeKey) newOffset() (uint64, error) {
 	rk.offset = rk.offset + 1
 
 	return auxOffset, nil
+}
+
+func (rk *RangeKey) subString() string {
+	str := randomvalues.RandomUrlId()
+	if len(str) >= 2 {
+		str = str[0:1]
+	}
+	return str
 }
