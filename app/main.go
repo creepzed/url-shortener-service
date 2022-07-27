@@ -32,11 +32,13 @@ import (
 
 const (
 	host      = ""
-	port      = 8080
 	dbTimeOut = 5 * time.Second
 )
 
 var (
+	serverHost = os.Getenv("SERVER_HOST")
+	serverPort = os.Getenv("SERVER_PORT")
+
 	mongoDBURI        = os.Getenv("MONGODB_URI")
 	mongoDBName       = os.Getenv("MONGODB_DATABASE")
 	mongoDBCollection = os.Getenv("MONGODB_COLLECTION")
@@ -99,6 +101,7 @@ func main() {
 		log.WithError(err).Fatal("the KGS is required to initialize the service")
 	}
 
+	log.Debug("Infrastructure - OK")
 	//create service
 	createService := creating.NewCreateApplicationService(repositoryMongo, eventBusKafka)
 	createCommandHandler := creating.NewCreateUrlShortenerCommandHandler(createService)
@@ -136,7 +139,7 @@ func main() {
 	// server
 	controllers.NewUrlShortenerController(server, commandBusInMemory, queryBusInMemory, keyGeneratorService)
 	go func() {
-		if err := server.StartServer(rest.Setup(host, port)); err != http.ErrServerClosed {
+		if err := server.StartServer(rest.Setup(serverHost, serverPort)); err != http.ErrServerClosed {
 			server.Logger.Fatal("shutting down the server")
 		}
 	}()
@@ -148,6 +151,7 @@ func main() {
 	ctxServer, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctxServer); err != nil {
+		log.Debug("Error Fatal Server...")
 		server.Logger.Fatal(err)
 	}
 

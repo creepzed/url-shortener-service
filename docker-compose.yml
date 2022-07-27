@@ -2,21 +2,22 @@ version: '3.8'
 
 services:
 
-#  api:
-#    env_file:
-#      - .env
-#    build:
-#      context: ./
-#      target: production
-#    links:
-#      - mongo:mongo
-#      - redis:redis
-#      - kafka:kafka
-#    image: golang:url-shorterner-service
-#    command: go run app/main.go
-#    restart: always
-#    ports:
-#      - "8080:8080"
+  api:
+    env_file:
+      - .env
+    build:
+      context: ./
+      target: production
+    links:
+      - mongo:mongo
+      - redis:redis
+      - kafka:kafka
+      - zookeeper_kgs
+    image: golang:url-shorterner-service
+    command: go run app/main.go
+    restart: always
+    ports:
+      - "8080:8080"
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -33,6 +34,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - '2181:2181'
+
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
@@ -81,8 +83,6 @@ services:
     environment:
       HTTP_PORT: 9000
 
-
 volumes:
   cache:
   mongodb:
-  zkdata:

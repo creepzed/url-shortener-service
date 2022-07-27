@@ -32,9 +32,9 @@ func New() *echo.Echo {
 	return echo
 }
 
-func Setup(host string, port uint) *http.Server {
+func Setup(host string, port string) *http.Server {
 	server := &http.Server{
-		Addr:         fmt.Sprintf("%s:%d", host, port),
+		Addr:         fmt.Sprintf("%s:%s", host, port),
 		ReadTimeout:  httpReadTimeout,
 		WriteTimeout: httpWriteTimeout,
 	}
