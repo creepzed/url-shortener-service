@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/log"
+	"github.com/creepzed/url-shortener-service/docs/openapi"
 	_ "github.com/creepzed/url-shortener-service/docs/openapi"
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
@@ -43,6 +44,9 @@ func New() *echo.Echo {
 	echo.Validator = NewValidator()
 
 	echo.HideBanner = true
+
+	openApi := openapi.SwaggerInfo.Version
+	log.Debug(openApi)
 
 	NewHealthHandler(echo)
 	echo.GET("/swagger/*", echoSwagger.WrapHandler)
