@@ -34,9 +34,10 @@ func NewReportApplicationService(service finding.FindApplicationService, produce
 func (ras reportWrapApplicationService) Do(ctx context.Context, query finding.FindUrlShortenerQuery) (query.Result, error) {
 
 	result, err := ras.service.Do(ctx, query)
-
-	ras.Publish(query, result)
-
+	if err == nil {
+		ras.Publish(query, result)
+	}
+	
 	return result, err
 }
 

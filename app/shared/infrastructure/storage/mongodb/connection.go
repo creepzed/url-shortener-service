@@ -70,10 +70,10 @@ func (d *DbConnection) GetCollection(ctx context.Context) (*mongo.Collection, er
 }
 
 func getClient(ctx context.Context, uri string) (*mongo.Client, error) {
-	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
+	//serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
 	clientOptions := options.Client().
 		ApplyURI(uri).
-		SetServerAPIOptions(serverAPIOptions).
+		//SetServerAPIOptions(serverAPIOptions).
 		SetServerSelectionTimeout(dbTimeout)
 
 	client, err := mongo.Connect(ctx, clientOptions)
