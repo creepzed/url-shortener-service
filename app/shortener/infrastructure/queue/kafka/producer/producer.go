@@ -2,6 +2,7 @@ package producer
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"github.com/creepzed/url-shortener-service/app/shared/domain/queue"
 	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/log"
@@ -27,8 +28,12 @@ func NewKafkaPublisher(kafkaDialer *kafka.Dialer, brokers ...string) *publisher 
 func (p *publisher) getKafkaWriter(topic string) *kafka.Writer {
 	if p.kafkaWriters[topic] == nil {
 		p.kafkaWriters[topic] = &kafka.Writer{
-			Addr:     kafka.TCP(p.brokers...),
-			Topic:    topic,
+			Addr:  kafka.TCP(p.brokers...),
+			Topic: topic,
+			Transport: &kafka.Transport{
+				TLS:  &tls.Config{},
+				SASL: p.dialer.SASLMechanism,
+			},
 			Balancer: &kafka.Hash{},
 			//Balancer:    &kafka.LeastBytes{},
 			Compression: compress.Snappy,

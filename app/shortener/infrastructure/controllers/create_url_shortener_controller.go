@@ -3,13 +3,13 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"github.com/creepzed/url-shortener-service/app/shared/infrastructure/log"
 	"github.com/creepzed/url-shortener-service/app/shortener/application/creating"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/exception"
 	"github.com/creepzed/url-shortener-service/app/shortener/domain/vo"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers/request"
 	"github.com/creepzed/url-shortener-service/app/shortener/infrastructure/controllers/response"
 	"github.com/labstack/echo/v4"
-	"log"
 	"net/http"
 )
 
@@ -28,7 +28,7 @@ func (ctrl *urlShortenerController) Create(c echo.Context) (err error) {
 
 	urlId, err := ctrl.kgs.GetKey()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("error fatal ksg: %s", err.Error())
 	}
 
 	cmd := creating.NewCreateUrlShortenerCommand(
